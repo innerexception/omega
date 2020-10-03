@@ -2,6 +2,7 @@ import { UIReducerActions, Modal, Air } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
 import { getNextPlayerId } from '../Util';
+import { strictEqual } from 'assert';
 
 export const onSearch = () => {
     dispatch({
@@ -85,6 +86,30 @@ export const onCreateMatch = async (name:string, player:PlayerState) => {
         match
     })
 }
+
+export const onTurnTick = () => {
+    let match = store.getState().match
+    let me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
+    if(store.getState().matchTicks % 10 === 0){
+        match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
+        me.actions = 2
+        //Virus action
+        for(let i=0; i<match.players.length+3; i++){
+            let room = match.rooms[Phaser.Math.Between(0,match.rooms.length-1)]
+            if(room.airState < Air.Vacuum) room.airState++
+        }
+        Provider.upsertMatch(match)
+        dispatch({
+            type: UIReducerActions.MATCH_TICK,
+        })
+    }
+    else if(store.getState().onlineAccount.uid === match.activePlayerId){
+        dispatch({
+            type: UIReducerActions.MATCH_TICK,
+        })
+    }
+}
+
 
 export const onJoinMatch = async (matchId:string, player:PlayerState) => {
     await Provider.joinMatch(matchId, player)

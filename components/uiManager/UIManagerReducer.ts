@@ -1,5 +1,7 @@
 import { UIReducerActions, Modal, RoomItem } from '../../enum'
-import Provider, { serviceEmail, servicePwd } from '../../firebase/Network';
+import Provider from '../../firebase/Network';
+import { onTurnTick } from './Thunks';
+
 
 const appReducer = (state = getInitialState(), action:any):RState => {
     state.engineEvent = null
@@ -33,7 +35,7 @@ const appReducer = (state = getInitialState(), action:any):RState => {
                 }
             })
             Provider.upsertMatch(match)
-            return { ...state, match, modalState:null }
+            return { ...state, match, turnTimer: setInterval(onTurnTick, 1000), modalState:null }
         case UIReducerActions.LEAVE_MATCH:
             if(state.onlineAccount) Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
             else return getInitialState()
@@ -44,13 +46,16 @@ const appReducer = (state = getInitialState(), action:any):RState => {
         case UIReducerActions.UPDATE_NAME:
             return { ...state, onlineAccount: {...state.onlineAccount, displayName: action.name}}
         case UIReducerActions.JOIN_EXISTING:
-            return { ...state, onlineAccount: action.user, match: action.match, modalState:null }
+            return { ...state, onlineAccount: action.user, match: action.match, modalState:null, turnTimer: setInterval(onTurnTick, 1000) }
         case UIReducerActions.SEARCH:
             return { ...state, engineEvent: { event: UIReducerActions.SEARCH, data:null }}
         case UIReducerActions.REPAIR:
             return { ...state, engineEvent: { event: UIReducerActions.REPAIR, data:null }}
         case UIReducerActions.START_MOVE:
             return { ...state, engineEvent: { event: UIReducerActions.START_MOVE, data:null }}
+        case UIReducerActions.MATCH_TICK:
+            state.matchTicks++
+            return { ...state, matchTicks: state.matchTicks }
         default:
             return state
     }
@@ -63,6 +68,8 @@ const getInitialState = ():RState => {
         modalState: { modal: Modal.MENU },
         match: null,
         onlineAccount: null,
-        engineEvent: null
+        engineEvent: null,
+        turnTimer: null,
+        matchTicks:0
     }
 }

@@ -15,7 +15,8 @@ export enum UIReducerActions {
     SEARCH,
     START_MOVE,
     REPAIR,
-    KILL_VIRUS
+    KILL_VIRUS,
+    MATCH_TICK
 }
 
 export const FONT_DEFAULT = {

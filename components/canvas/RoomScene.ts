@@ -216,7 +216,7 @@ export default class RoomScene extends Scene {
             let p = match.players.find(p=>p.roomY===r.roomY && p.roomX === r.roomX)
             if(p){
                 let tile = this.map.getTileAt(r.roomX+1, r.roomY+1, false, 'terrain')
-                let pl = new Player(this, tile.getCenterX(), tile.getCenterY()-6, p.id)
+                let pl = new Player(this, tile.getCenterX(), tile.getCenterY()-6, p.id, Phaser.Display.Color.HexStringToColor(p.color).color)
                 this.players.push(pl)
                 if(p.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
             } 

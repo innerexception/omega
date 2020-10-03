@@ -27,7 +27,6 @@ interface ModalState {
 interface Match { 
     id:string
     activePlayerId:string
-    turnTimer: number
     players: Array<PlayerState>
     rooms: Array<RoomState>
     isVictory:boolean
@@ -46,4 +45,6 @@ interface RState {
     engineEvent: EngineEvent
     match: Match
     onlineAccount:firebase.User
+    turnTimer: any
+    matchTicks:number
 }

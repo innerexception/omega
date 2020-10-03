@@ -31,7 +31,6 @@ export const getNewMatchObject = (player:PlayerState) => {
         players: [player],
         id:v4(),
         activePlayerId: player.id,
-        turnTimer: 10,
         isVictory: false,
         rooms: generateStationRooms()
     }
