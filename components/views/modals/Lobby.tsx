@@ -76,9 +76,6 @@ export default class Lobby extends React.Component<Props,State> {
 }
 
 const findLowestPopMatch = (matches:Array<Match>) => {
-    let sorted = matches.sort((a,b)=>{
-        if(a.players.length > b.players.length) return 1
-        else return -1
-    })[0]
-    if(sorted && sorted.players.length <= 5) return sorted
+    let sorted = matches.filter(m=>m.players.length < 5)
+    if(sorted[0]) return sorted[Phaser.Math.Between(0, sorted.length-1)]
 }

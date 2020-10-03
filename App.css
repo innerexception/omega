@@ -1,6 +1,10 @@
 @font-face {
   font-family: 'Body';
-  src: url('./assets/VeniceClassic.ttf')  format('truetype')
+  src: url('./assets/2Credits.ttf')  format('truetype')
+}
+@font-face {
+  font-family: 'Title';
+  src: url('./assets/RoadWC98.ttf')  format('truetype')
 }
 
 html {
@@ -10,7 +14,7 @@ html {
 
 body {
   font-family: 'Body';
-  font-size: 24px;
+  font-size: 20px;
   line-height: unset;
   user-select: none;
 }

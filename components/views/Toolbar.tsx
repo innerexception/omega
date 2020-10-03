@@ -35,7 +35,7 @@ export default class Toolbar extends React.Component<Props> {
             <h4>{activePlayer.actions} Actions Left</h4>
         </div>,
         <div style={{display:'flex', alignItems:"center"}}>
-            <h6>Time: {TURN_LENGTH-(this.props.ticks % TURN_LENGTH)}</h6>
+            <h6>Virus Spread: {TURN_LENGTH-(this.props.ticks % TURN_LENGTH)}</h6>
             <div style={{marginRight:'0.5em', marginLeft:'0.5em'}}>
                 {Button(true, onStartMove, '(M)ove')}
             </div>

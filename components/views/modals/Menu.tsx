@@ -44,7 +44,7 @@ export default class Menu extends React.Component<Props, State> {
         return (
             <div style={{...AppStyles.modal, justifyContent:'space-between'}}>
                 <div>
-                    <h2>Borders</h2>
+                    <h1 style={{fontFamily:'Title'}}>Omega Virus</h1>
                     <hr/>
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-around', height:'230px'}}>
                         <div style={{backgroundImage: 'url('+splash+')', backgroundPosition:'center', width: '250px', height:'190px', border:'2px inset'}}/>
