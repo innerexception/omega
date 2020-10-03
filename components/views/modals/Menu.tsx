@@ -2,7 +2,6 @@ import * as React from 'react'
 import AppStyles from '../../../AppStyles';
 import { Button } from '../../Shared';
 import { getErrorMessage } from '../../Util';
-import { onStartOffline } from '../../uiManager/Thunks';
 import Provider from '../../../firebase/Network';
 
 const splash = require('../../../assets/Cryptomnesic2.png')

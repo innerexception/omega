@@ -2,7 +2,7 @@ import * as React from 'react'
 import { RoomItem } from '../../enum';
 import { connect } from 'react-redux';
 import { TileIcon, Button, TopBar } from '../Shared';
-import { onSearch, onRepair } from '../uiManager/Thunks';
+import { onSearch, onRepair, onStartMove, onKillVirus } from '../uiManager/Thunks';
 import AppStyles, { modalBg } from '../../AppStyles'
 
 interface Props {

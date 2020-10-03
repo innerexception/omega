@@ -1,10 +1,18 @@
-import { Scene, GameObjects, Tilemaps } from "phaser";
+import { Scene, GameObjects, Tilemaps, Geom } from "phaser";
 import { store } from "../../App";
 import { defaults } from '../../assets/Assets'
 import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air } from "../../enum";
 import Player from "./Interactable";
-import { onMatchUpdated, onEndPlayerAction } from "../uiManager/Thunks";
+import { onMatchUpdated, onEndPlayerAction, onMove } from "../uiManager/Thunks";
+import { DIRS } from "../generators/digger";
 const ROOM_DIM = 3
+const TILE_WIDTH=16
+
+interface RoomShape {
+     room:RoomState
+     shape:Geom.Rectangle
+}
+
 export default class RoomScene extends Scene {
 
     unsubscribeRedux: Function
@@ -14,6 +22,7 @@ export default class RoomScene extends Scene {
     playerLayer: Tilemaps.DynamicTilemapLayer
     isDrawingBorder:boolean
     effects: GameObjects.Group
+    roomShapes: Array<RoomShape>
     borderQueue: Array<Tilemaps.Tile>                                                        
     g: GameObjects.Graphics
     initCompleted: boolean
@@ -110,19 +119,36 @@ export default class RoomScene extends Scene {
                     break
                 case UIReducerActions.START_MOVE:
                     //Highlight adjacent rooms
+                    const state = store.getState()
+                    let plData = state.match.players.find(p=>p.id === state.onlineAccount.uid)
+                    let room = state.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                    this.g.clear()
+                    room.exits.forEach(e=>{
+                        DIRS[4].forEach(dir=>{
+                            const ex = e.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
+                            const ey = e.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
+                            let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
+                            if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY)){
+                                this.g.fillRectShape(neighbor.shape)
+                            }
+                        })
+                    })
                     break
             }
     }
 
     create = () =>
     {
+        this.g = this.add.graphics()
+        this.g.defaultFillColor = 0x00ff00
+        this.g.defaultFillAlpha = 0.5
+        this.g.depth = 2
         this.cameras.main.setZoom(2)
-        this.map = this.add.tilemap(undefined, 16,16, 100,100)
-        let baseTiles = this.map.addTilesetImage('base-tiles', 'base-tiles', 16,16)
-        this.add.tileSprite(this.cameras.main.centerX-this.map.widthInPixels/2, this.cameras.main.centerY-this.map.heightInPixels/2,2000,2000, 'tiny2')
-        this.map.createBlankDynamicLayer('terrain', baseTiles, this.cameras.main.centerX-this.map.widthInPixels/2, this.cameras.main.centerY-this.map.heightInPixels/2)
-        this.map.createBlankDynamicLayer('items', baseTiles, this.cameras.main.centerX-this.map.widthInPixels/2, this.cameras.main.centerY-this.map.heightInPixels/2)
-        
+        this.map = this.add.tilemap(undefined, TILE_WIDTH,TILE_WIDTH, 100,100)
+        let baseTiles = this.map.addTilesetImage('base-tiles', 'base-tiles', TILE_WIDTH,TILE_WIDTH)
+        this.add.tileSprite(this.cameras.main.centerX, this.cameras.main.centerY,2000,2000, 'tiny2')
+        this.map.createBlankDynamicLayer('terrain', baseTiles)
+        this.map.createBlankDynamicLayer('items', baseTiles)
         this.anims.create({
             key: 'welding',
             frames: this.anims.generateFrameNumbers('welding', { start: 0, end: 10 }),
@@ -147,7 +173,13 @@ export default class RoomScene extends Scene {
             
         })
         this.input.on('pointerdown', (event, GameObjects) => {
-            this.tryShowTileInfo()
+            if(GameObjects[0]){
+                console.log('clicked a g')
+                // const state = store.getState()
+                // const me = state.match.players.find(p=>p.id === state.onlineAccount.uid)
+                // const room = null
+                // onMove(me, room)
+            }
         })
         this.initCompleted = true
     }
@@ -155,7 +187,9 @@ export default class RoomScene extends Scene {
     redrawBoard = (match:Match) => {
         this.players.forEach(p=>p.destroy())
         this.players = []
+        this.roomShapes = []
         match.rooms.forEach(r=>{
+            this.roomShapes.push({room:r, shape: new Geom.Rectangle(r.roomX*TILE_WIDTH, r.roomY*TILE_WIDTH, 3*TILE_WIDTH,3*TILE_WIDTH)})
             for(var x=r.roomX; x<r.roomX+ROOM_DIM; x++){
                 for(var y=r.roomY;y<r.roomY+ROOM_DIM;y++){
                     this.map.putTileAt(r.airState, x,y, false, 'terrain')

@@ -49,7 +49,7 @@ export default class Lobby extends React.Component<Props,State> {
             <div style={{...AppStyles.modal, justifyContent:'space-between'}}>
                 <div>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop:'5px'}}>
-                        <h2>Matches</h2>
+                        <h2>Stations</h2>
                         <div style={{width:'100px'}}>{Button(true, ()=>Provider.logoutUser(), 'Logout')}</div>
                     </div>
                     <hr/>
@@ -61,20 +61,24 @@ export default class Lobby extends React.Component<Props,State> {
                         <div style={{marginLeft:'1em'}}>{Button(this.state.playerName !== this.props.player.displayName, ()=>Provider.onEditHandle(this.state.playerName), 'Set')}</div>
                     </div>
                     <hr/>
-                    <div style={{height:'4em', overflow:'auto', marginBottom:'0.5em'}}>
-                        {this.state.matches.filter(m=>!m.isStarted).map(m=>
-                            <div onClick={()=>this.setState({selectedMatch: m})} 
-                                 style={{cursor:'pointer', border: this.getBorder(m)}}>
-                                <h5>{m.players.length} Nations</h5>
-                            </div>
-                        )}
-                    </div>
                     <div style={{display:'flex', justifyContent:'flex-end'}}>
-                        <div style={{width:'100px', marginRight:'0.5em'}}>{Button(true, ()=>onCreateMatch(this.state.playerName+"'s Match", getNewPlayer(this.state.playerName, this.props.player.uid)), 'Create')}</div>
-                        <div style={{width:'100px'}}>{Button(this.state.selectedMatch?true:false, ()=>onJoinMatch(this.state.selectedMatch.id, getNewPlayer(this.state.playerName, this.props.player.uid)), 'Join')}</div>
+                        <div style={{width:'100px', marginRight:'0.5em'}}>{Button(true, ()=>onCreateMatch(this.state.playerName+"'s Station", getNewPlayer(this.state.playerName, this.props.player.uid)), 'Create Station')}</div>
+                        {findLowestPopMatch(this.state.matches) && 
+                            <div style={{width:'100px'}}>
+                                {Button(true, ()=>onJoinMatch(findLowestPopMatch(this.state.matches).id, getNewPlayer(this.state.playerName, this.props.player.uid)), 'Join Station')}
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         )
     }
+}
+
+const findLowestPopMatch = (matches:Array<Match>) => {
+    let sorted = matches.sort((a,b)=>{
+        if(a.players.length > b.players.length) return 1
+        else return -1
+    })[0]
+    if(sorted && sorted.players.length <= 5) return sorted
 }

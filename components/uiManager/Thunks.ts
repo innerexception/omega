@@ -15,6 +15,18 @@ export const onRepair = () => {
     })
 }
 
+export const onStartMove = () => {
+    dispatch({
+        type: UIReducerActions.START_MOVE
+    })
+}
+
+export const onKillVirus = () => {
+    dispatch({
+        type: UIReducerActions.KILL_VIRUS
+    })
+}
+
 export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
     let match = store.getState().match
     match.players.forEach(p=>{

@@ -30,9 +30,9 @@ export const getNewMatchObject = (player:PlayerState) => {
     let match:Match = {
         players: [player],
         id:v4(),
-        hostPlayerId: player.id,
+        activePlayerId: player.id,
         turnTimer: 10,
-        isStarted: false,
+        isVictory: false,
         rooms: generateStationRooms()
     }
     return match
@@ -80,7 +80,8 @@ export const getNewPlayer = (name:string, uid:string) => {
         color: PlayerColors[Phaser.Math.Between(0,PlayerColors.length-1)],
         roomX:0,
         roomY:0,
-        inventory:[]
+        inventory:[],
+        actions: 2
     }
     return player
 }

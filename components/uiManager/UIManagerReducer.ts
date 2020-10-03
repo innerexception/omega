@@ -49,6 +49,8 @@ const appReducer = (state = getInitialState(), action:any):RState => {
             return { ...state, engineEvent: { event: UIReducerActions.SEARCH, data:null }}
         case UIReducerActions.REPAIR:
             return { ...state, engineEvent: { event: UIReducerActions.REPAIR, data:null }}
+        case UIReducerActions.START_MOVE:
+            return { ...state, engineEvent: { event: UIReducerActions.START_MOVE, data:null }}
         default:
             return state
     }
