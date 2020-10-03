@@ -1,0 +1,11 @@
+Omega Virus
+
+1. draw generated station map with players and items
+2. use arrow keys to move players to adjcent connected rooms
+5. Players must lock in moves within 10+number of players seconds
+6. Player moves are executed at that interval
+3. choose action: move, repair, search, (special: breach door. 0 move cost but area will decompress as one space)
+4. rooms randomly get decompressed in 2 stages
+7. Players can't move through vacuum rooms without a suit
+8. Collect 3 data spheres and get to the core memory access
+9. Dropin/dropout up to 5?
