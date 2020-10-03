@@ -38,6 +38,12 @@ export const getNewMatchObject = (player:PlayerState) => {
     return match
 }
 
+export const playersHaveKeys = (coreRoom:RoomState, players:Array<PlayerState>) => {
+    const playersInRoom = players.filter(p=>p.roomX === coreRoom.roomX && p.roomY === coreRoom.roomY)
+    const playersInventory = playersInRoom.map(p=>p.inventory).reduce((acc, val)=>acc.concat(val), [])
+    return playersInventory.includes(RoomItem.BlueSphere) && playersInventory.includes(RoomItem.GreenSphere) && playersInventory.includes(RoomItem.PurpleSphere) && playersInventory.includes(RoomItem.RedSphere)
+}
+
 export const generateStationRooms = () => {
     let rooms = new Array<RoomState>()
     let items = RoomItems

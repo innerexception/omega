@@ -15,7 +15,7 @@ const appReducer = (state = getInitialState(), action:any):RState => {
         case UIReducerActions.LOGIN_SUCCESS:
             return { ...state, onlineAccount: action.user, modalState: { modal: Modal.LOBBY }}
         case UIReducerActions.MATCH_UPDATED:
-            return { ...state, match: action.match, engineEvent: { event: UIReducerActions.MATCH_UPDATED, data: action.match } }
+            return { ...state, match: {...action.match}, engineEvent: { event: UIReducerActions.MATCH_UPDATED, data: action.match } }
         case UIReducerActions.MATCH_JOIN:
             return { ...state, match:action.match, modalState: { modal: Modal.MATCH_LOBBY } }
         case UIReducerActions.MATCH_START:

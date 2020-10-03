@@ -23,6 +23,7 @@ export default class RoomScene extends Scene {
     isDrawingBorder:boolean
     effects: GameObjects.Group
     roomShapes: Array<RoomShape>
+    validMoves: Array<RoomShape>
     borderQueue: Array<Tilemaps.Tile>                                                        
     g: GameObjects.Graphics
     initCompleted: boolean
@@ -35,6 +36,7 @@ export default class RoomScene extends Scene {
         super(config)
         this.unsubscribeRedux = store.subscribe(this.onReduxUpdate)
         this.players = []
+        this.validMoves = []
     }
 
     preload = () =>
@@ -80,6 +82,7 @@ export default class RoomScene extends Scene {
                                 }
                                 return p
                             })}
+                            room.roomItem = null
                             onEndPlayerAction(match)
                         }
                     })
@@ -128,8 +131,11 @@ export default class RoomScene extends Scene {
                             const ex = e.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
                             const ey = e.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
                             let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
-                            if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY)){
-                                this.g.fillRectShape(neighbor.shape)
+                            if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && neighbor.room.airState < Air.Vacuum){
+                                if(!this.validMoves.includes(neighbor)){
+                                    this.validMoves.push(neighbor)
+                                    this.g.fillRectShape(neighbor.shape)
+                                }
                             }
                         })
                     })
@@ -173,12 +179,13 @@ export default class RoomScene extends Scene {
             
         })
         this.input.on('pointerdown', (event, GameObjects) => {
-            if(GameObjects[0]){
-                console.log('clicked a g')
-                // const state = store.getState()
-                // const me = state.match.players.find(p=>p.id === state.onlineAccount.uid)
-                // const room = null
-                // onMove(me, room)
+            const move = this.validMoves.find(m=>m.shape.contains(this.input.activePointer.worldX, this.input.activePointer.worldY))
+            if(move){
+                const state = store.getState()
+                const me = state.match.players.find(p=>p.id === state.onlineAccount.uid)
+                this.g.clear()
+                this.validMoves = []
+                onMove(me, move.room.roomX, move.room.roomY)
             }
         })
         this.initCompleted = true
@@ -195,14 +202,17 @@ export default class RoomScene extends Scene {
                     this.map.putTileAt(r.airState, x,y, false, 'terrain')
                 }
             }
-            this.map.putTileAt(1,1,9, false, 'terrain')
+            this.map.putTileAt(RoomItem.Logo, r.roomX+1,r.roomY+1,false,'terrain')
             r.exits.forEach(e=>{
                 this.map.putTileAt(0, e.x,e.y, false, 'terrain')
                 this.map.putTileAt(7, e.x,e.y, false, 'items')
             })
+
             if(r.roomItem){
                 this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
             }
+            else this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')
+
             let p = match.players.find(p=>p.roomY===r.roomY && p.roomX === r.roomX)
             if(p){
                 let tile = this.map.getTileAt(r.roomX+1, r.roomY+1, false, 'terrain')

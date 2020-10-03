@@ -1,4 +1,4 @@
-import { UIReducerActions, Modal } from '../../enum'
+import { UIReducerActions, Modal, Air } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
 import { getNextPlayerId } from '../Util';
@@ -35,7 +35,7 @@ export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
             player.roomY = roomY
         }
     })
-    Provider.upsertMatch(match)
+    onEndPlayerAction(match)
 }
 
 export const onLeaveMatch = () => {
@@ -109,11 +109,13 @@ export const onEndPlayerAction = (match:Match) => {
     if(me.actions <= 0){
         match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
         me.actions = 2
+        //Virus action
+        for(let i=0; i<match.players.length+3; i++){
+            let room = match.rooms[Phaser.Math.Between(0,match.rooms.length-1)]
+            if(room.airState < Air.Vacuum) room.airState++
+        }
     }
-    dispatch({
-        type: UIReducerActions.MATCH_UPDATED,
-        match
-    })
+    Provider.upsertMatch(match)
 }
 
 export const onMatchJoin = (match:Match) => {

@@ -52,7 +52,7 @@ export enum Air {
 }
 
 export enum RoomItem {
-    PurpleSphere=3, RedSphere=4, GreenSphere=5, BlueSphere=6, CoreMemory=8, Exit=7, Suit=9
+    PurpleSphere=3, RedSphere=4, GreenSphere=5, BlueSphere=6, CoreMemory=8, Exit=7, Logo=9
 }
 
-export const RoomItems = [RoomItem.Suit, RoomItem.RedSphere, RoomItem.BlueSphere, RoomItem.GreenSphere, RoomItem.PurpleSphere, RoomItem.CoreMemory]
+export const RoomItems = [RoomItem.RedSphere, RoomItem.BlueSphere, RoomItem.GreenSphere, RoomItem.PurpleSphere, RoomItem.CoreMemory]
