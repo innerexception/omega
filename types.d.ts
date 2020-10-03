@@ -14,6 +14,14 @@ interface PlayerState {
     actions: number
 }
 
+interface GraveState {
+    id:string
+    name: string
+    color: string
+    roomX: number
+    roomY: number
+}
+
 interface EngineEvent {
     event: import('./enum').UIReducerActions
     data: any
@@ -28,6 +36,7 @@ interface Match {
     id:string
     activePlayerId:string
     players: Array<PlayerState>
+    graves: Array<GraveState>
     rooms: Array<RoomState>
     isVictory:boolean
 }

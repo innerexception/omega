@@ -4,10 +4,10 @@ import { firebaseConfig } from './firebase.config.js'
 // These imports load individual services into the firebase namespace.
 import 'firebase/auth';
 import 'firebase/firestore';
-import {  } from '../enum';
+import { RoomItem, Air } from '../enum';
 import { Schemas } from './Schemas'
 import { onLoginUser, onMatchUpdated, onLogoutUser, onMatchJoin, onUpdatePlayerName, onJoinExisting } from '../components/uiManager/Thunks';
-import { getNewMatchObject } from '../components/Util';
+import { getNewMatchObject, getNextPlayerId } from '../components/Util';
 
 export const servicePwd = '4yhw64h67eh6s5gs5rgghn#^H#%^H'
 export const serviceEmail = 'scoring@crytomnesicsoftworks.com'
@@ -67,6 +67,16 @@ class Network {
         if(ref.exists){
             let match = ref.data() as Match
             match.players.push(player)
+            match.rooms.forEach(r=>{
+                if(r.roomItem === RoomItem.CoreMemory){
+                    match.players.forEach(p=>{
+                        if(p.id === player.id){
+                            p.roomX = r.roomX
+                            p.roomY = r.roomY
+                        }
+                    })
+                }
+            })
             onMatchJoin(match)
             await this.upsertMatch(match)
             this.subscribeToMatch(match.id)
@@ -106,8 +116,18 @@ class Network {
         if(this.unsub){
             this.unsub()
             this.unsub = null
+            if(match.activePlayerId === playerId) {
+                match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
+            }
+            let pl = match.players.find(p=>p.id === playerId)
+            pl.inventory.forEach(i=>{
+                let available = match.rooms.filter(r=>r.airState > Air.Vacuum)
+                let candidate = available[Phaser.Math.Between(0, available.length-1)]
+                if(candidate) candidate.roomItem = i
+            })
             match.players = match.players.filter(p=>p.id !== playerId)
-            this.upsertMatch(match)
+            if(match.players.length <= 0) this.deleteMatch(match.id)
+            else this.upsertMatch(match)
         }
     }
 

@@ -1,4 +1,4 @@
-import { UIReducerActions, Modal, Air } from '../../enum'
+import { UIReducerActions, Modal, Air, TURN_LENGTH } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
 import { getNextPlayerId } from '../Util';
@@ -90,14 +90,10 @@ export const onCreateMatch = async (name:string, player:PlayerState) => {
 export const onTurnTick = () => {
     let match = store.getState().match
     let me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
-    if(store.getState().matchTicks % 10 === 0){
+    if(store.getState().matchTicks % TURN_LENGTH === 0){
         match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
         me.actions = 2
-        //Virus action
-        for(let i=0; i<match.players.length+3; i++){
-            let room = match.rooms[Phaser.Math.Between(0,match.rooms.length-1)]
-            if(room.airState < Air.Vacuum) room.airState++
-        }
+        match = virusAction(match)
         Provider.upsertMatch(match)
         dispatch({
             type: UIReducerActions.MATCH_TICK,
@@ -134,11 +130,6 @@ export const onEndPlayerAction = (match:Match) => {
     if(me.actions <= 0){
         match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
         me.actions = 2
-        //Virus action
-        for(let i=0; i<match.players.length+3; i++){
-            let room = match.rooms[Phaser.Math.Between(0,match.rooms.length-1)]
-            if(room.airState < Air.Vacuum) room.airState++
-        }
     }
     Provider.upsertMatch(match)
 }
@@ -157,3 +148,20 @@ export const onUpdatePlayerName = (name:string) => {
     })
 }
 
+const virusAction = (match:Match) => {
+    //Virus action
+    for(let i=0; i<match.players.length+3; i++){
+        let eligibleRooms = match.rooms.filter(r=>r.airState<Air.Vacuum)
+        let room = eligibleRooms[Phaser.Math.Between(0,eligibleRooms.length-1)]
+        if(room){
+            room.airState++
+            if(room.airState === Air.Vacuum){
+                let pl = match.players.find(p=>p.roomX === room.roomX && p.roomY === room.roomY)
+                if(pl){
+                    match.graves.push({...pl})
+                }
+            }
+        }
+    }
+    return match
+}

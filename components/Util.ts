@@ -29,6 +29,7 @@ export const setSelectIconPosition = (scene:RoomScene, tile:Tuple) => {
 export const getNewMatchObject = (player:PlayerState) => {
     let match:Match = {
         players: [player],
+        graves: [],
         id:v4(),
         activePlayerId: player.id,
         isVictory: false,

@@ -2,6 +2,7 @@ export const defaults = [
     { key: 'base-tiles', resource: require('./floor.png'), type: 'image' },
     { key: 'selected', resource: require('./selected.png'), type: 'image'},
     { key: 'player', resource: require('./meeple.png'), type: 'image'},
+    { key: 'grave', resource: require('./grave.png'), type: 'image'},
     { key: 'tiny2', resource: require('./patterns/beige.png'), type: 'image'},
     { key: 'welding', resource: require('./shock.png'), type: 'spritesheet', data:  { frameWidth: 100, frameHeight: 100 } },
     { key: 'hacking', resource: require('./hacking.png'), type: 'spritesheet', data:  { frameWidth: 100, frameHeight: 100 } },

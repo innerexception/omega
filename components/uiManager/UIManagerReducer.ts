@@ -19,7 +19,8 @@ const appReducer = (state = getInitialState(), action:any):RState => {
         case UIReducerActions.MATCH_UPDATED:
             return { ...state, match: {...action.match}, engineEvent: { event: UIReducerActions.MATCH_UPDATED, data: action.match } }
         case UIReducerActions.MATCH_JOIN:
-            return { ...state, match:action.match, modalState: { modal: Modal.MATCH_LOBBY } }
+            clearInterval(state.turnTimer)
+            return { ...state, match:action.match, modalState: { modal: Modal.MATCH_LOBBY }, turnTimer: setInterval(onTurnTick, 1000) }
         case UIReducerActions.MATCH_START:
             let mmatch = {...state.match, isStarted: true }
             Provider.upsertMatch(mmatch)
@@ -35,17 +36,20 @@ const appReducer = (state = getInitialState(), action:any):RState => {
                 }
             })
             Provider.upsertMatch(match)
+            clearInterval(state.turnTimer)
             return { ...state, match, turnTimer: setInterval(onTurnTick, 1000), modalState:null }
         case UIReducerActions.LEAVE_MATCH:
-            if(state.onlineAccount) Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
-            else return getInitialState()
+            Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
+            clearInterval(state.turnTimer)
             return { ...state, match: null, modalState: { modal: Modal.LOBBY }}
         case UIReducerActions.LOGOUT:
-            if(state.onlineAccount) Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
+            Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
+            clearInterval(state.turnTimer)
             return getInitialState()
         case UIReducerActions.UPDATE_NAME:
             return { ...state, onlineAccount: {...state.onlineAccount, displayName: action.name}}
         case UIReducerActions.JOIN_EXISTING:
+            clearInterval(state.turnTimer)
             return { ...state, onlineAccount: action.user, match: action.match, modalState:null, turnTimer: setInterval(onTurnTick, 1000) }
         case UIReducerActions.SEARCH:
             return { ...state, engineEvent: { event: UIReducerActions.SEARCH, data:null }}
