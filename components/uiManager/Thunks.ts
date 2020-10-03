@@ -1,24 +1,29 @@
 import { UIReducerActions, Modal } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
+import { getNextPlayerId } from '../Util';
 
-export const onPlacedTile = () => {
+export const onSearch = () => {
     dispatch({
-        type: UIReducerActions.PLACED_TILE
+        type: UIReducerActions.SEARCH
     })
 }
 
-
-export const onStartPlaceBorders = () => {
+export const onRepair = () => {
     dispatch({
-        type: UIReducerActions.START_BORDERS
+        type: UIReducerActions.REPAIR
     })
 }
 
-export const onCancelBorders = () => {
-    dispatch({
-        type: UIReducerActions.CANCEL_BORDERS
+export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
+    let match = store.getState().match
+    match.players.forEach(p=>{
+        if(p.id === player.id){
+            player.roomX = roomX
+            player.roomY = roomY
+        }
     })
+    Provider.upsertMatch(match)
 }
 
 export const onLeaveMatch = () => {
@@ -27,23 +32,9 @@ export const onLeaveMatch = () => {
     })
 }
 
-export const onConfirmBorder = (border:Array<Tuple>) => {
-    dispatch({
-        type: UIReducerActions.CONFIRM_BORDER,
-        border
-    })
-}
-
 export const onHideModal = () => {
     dispatch({
         type: UIReducerActions.HIDE_MODAL
-    })
-}
-
-export const onSaveBorder = (border:Array<Tuple>) => {
-    dispatch({
-        type: UIReducerActions.SAVE_BORDER,
-        border
     })
 }
 
@@ -65,12 +56,6 @@ export const onJoinExisting = (user:firebase.User, match:Match) => {
 export const onLogoutUser = () => {
     dispatch({
         type: UIReducerActions.LOGOUT
-    })
-}
-
-export const onStartOffline = () => {
-    dispatch({
-        type: UIReducerActions.START_OFFLINE
     })
 }
 
@@ -100,6 +85,19 @@ export const onStartMatch = () => {
 }
 
 export const onMatchUpdated = (match:Match) => {
+    dispatch({
+        type: UIReducerActions.MATCH_UPDATED,
+        match
+    })
+}
+
+export const onEndPlayerAction = (match:Match) => {
+    const me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
+    me.actions--
+    if(me.actions <= 0){
+        match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
+        me.actions = 2
+    }
     dispatch({
         type: UIReducerActions.MATCH_UPDATED,
         match

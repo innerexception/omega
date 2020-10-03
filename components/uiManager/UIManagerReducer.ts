@@ -1,4 +1,4 @@
-import { UIReducerActions, Modal } from '../../enum'
+import { UIReducerActions, Modal, RoomItem } from '../../enum'
 import Provider, { serviceEmail, servicePwd } from '../../firebase/Network';
 
 const appReducer = (state = getInitialState(), action:any):RState => {
@@ -8,8 +8,6 @@ const appReducer = (state = getInitialState(), action:any):RState => {
             return { ...state, modalState: {modal:Modal.MENU, data:action.message}}
         case UIReducerActions.TILE_POPUP: 
             return { ...state, modalState: {modal:Modal.TILE, data: action.tile}}
-        case UIReducerActions.CONFIRM_BORDER:
-            return { ...state, modalState: {modal: Modal.CONFIRM, data: action.border }}
         case UIReducerActions.SHOW_MODAL:
             return { ...state, modalState: { modal: action.modal } }
         case UIReducerActions.HIDE_MODAL:
@@ -25,7 +23,17 @@ const appReducer = (state = getInitialState(), action:any):RState => {
             Provider.upsertMatch(mmatch)
             return { ...state, match: mmatch, modalState: null}
         case UIReducerActions.MATCH_CREATED:
-            return { ...state, match: action.match, modalState:null }
+            let match = action.match
+            match.rooms.forEach(r=>{
+                if(r.roomItem === RoomItem.CoreMemory){
+                    match.players.forEach(p=>{
+                        p.roomX = r.roomX
+                        p.roomY = r.roomY
+                    })
+                }
+            })
+            Provider.upsertMatch(match)
+            return { ...state, match, modalState:null }
         case UIReducerActions.LEAVE_MATCH:
             if(state.onlineAccount) Provider.unsubscribeMatch(state.match, state.onlineAccount.uid)
             else return getInitialState()
@@ -37,6 +45,10 @@ const appReducer = (state = getInitialState(), action:any):RState => {
             return { ...state, onlineAccount: {...state.onlineAccount, displayName: action.name}}
         case UIReducerActions.JOIN_EXISTING:
             return { ...state, onlineAccount: action.user, match: action.match, modalState:null }
+        case UIReducerActions.SEARCH:
+            return { ...state, engineEvent: { event: UIReducerActions.SEARCH, data:null }}
+        case UIReducerActions.REPAIR:
+            return { ...state, engineEvent: { event: UIReducerActions.REPAIR, data:null }}
         default:
             return state
     }

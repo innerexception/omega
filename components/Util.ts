@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import RoomScene from './canvas/RoomScene';
 import { PlayerColors, RoomItem, RoomItems, Air } from '../enum';
 import * as thyDungeon from 'dungeon-generator' 
+import Digger from "./generators/digger";
 
 enum FirebaseAuthError {
     NOT_FOUND='auth/user-not-found',
@@ -40,42 +41,35 @@ export const getNewMatchObject = (player:PlayerState) => {
 export const generateStationRooms = () => {
     let rooms = new Array<RoomState>()
     let items = RoomItems
-    const generator = new thyDungeon({
-        "size": [100, 100],
-        "rooms": {
-            "initial": {
-                "min_size": [3, 3],
-                "max_size": [3, 3],
-                "max_exits": 1
-            },
-            "any": {
-                "min_size": [3, 3],
-                "max_size": [3,3],
-                "max_exits": 4
-            }
-        },
-        "max_corridor_length": 2,
-        "min_corridor_length": 2,
-        "corridor_density": 0.5,
-        "symmetric_rooms": true,
-        "interconnects": 0,
-        "max_interconnect_length": 0,
-        "room_count": 20
-    })
-    generator.generate()
-    generator.children.forEach(room=>{
-        rooms.push({
-            roomX: room.position[0],
-            roomY: room.position[1],
-            roomItem: items.length > 0 ? items.shift() : null,
-            airState: Air.Normal,
-            exits: room.exits.map(e=>{
-                return {
-                    x: e[0][0], y:e[0][1]
-                }
+    const digger = new Digger(50,25, {corridorLength: [0,0], dugPercentage:0.3, roomWidth:[3,3], roomHeight:[3,3]})
+    digger.create()
+    digger.getRooms().forEach((room,i) => {
+        var x = room._x1;
+        var y = room._y1;
+        // var w = room.getRight() - room.getLeft()
+        // var h = room.getBottom() - room.getTop()
+        // var cx = room.getCenter()[0]
+        // var cy = room.getCenter()[1]
+        // var left = room.getLeft()
+        // var right = room.getRight()
+        // var top = room.getTop()
+        // var bottom = room.getBottom()
+
+        let exits = []
+        room.getDoors((dx,dy)=>{
+            exits.push({
+                x: dx, y:dy
             })
         })
-    })
+
+        rooms.push({
+            roomX: x,
+            roomY: y,
+            roomItem: items.length > 0 ? items.shift() : null,
+            airState: Air.Normal,
+            exits
+        })
+    });
     return rooms
 }
 

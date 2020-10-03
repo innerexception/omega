@@ -110,7 +110,7 @@ export const TileIcon = (iconName:number) =>
         width:'16px', 
         height: '16px', 
         backgroundImage: 'url('+CSSTiles+')', 
-        backgroundPosition: -(iconName % 7)*16+'px '+-(Math.floor(iconName/7))*16+'px', 
+        backgroundPosition: -(iconName % 8)*16+'px 0px', 
         backgroundRepeat:'no-repeat',
         transform:'scale(1.5)',
         display:'inline-block'}}/>
