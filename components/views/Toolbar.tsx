@@ -62,10 +62,10 @@ export default class Toolbar extends React.Component<Props> {
                     </div>
                     {!coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(S)earch', 'Pickup any item found in this room')}
+                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(D)ownload', 'Pickup a decryption sphere found in this room. Only the droid can carry more than 1 at a time.')}
                         </div>}
                     <div style={{marginRight:'0.5em'}}>
-                        {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room')}
+                        {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room. Free for engineers.')}
                     </div>
                     {coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
@@ -75,7 +75,6 @@ export default class Toolbar extends React.Component<Props> {
                         <div style={{marginRight:'0.5em'}}>
                             {Button(activePlayer.inventory.length > 0, ()=>onDepositSpheres(activePlayer.inventory), '(D)eposit Spheres', 'Drop off a carried sphere. Return once all 4 have been delivered.')}
                         </div>}
-                    {Button(true, onPassTurn, '(P)ass', 'Skip your turn')}
                     {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
                 </div>
         ]

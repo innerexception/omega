@@ -42,15 +42,15 @@ export const PlayerColorData = {
     },
     [PlayerColors[1]]: {
         title: 'Scout',
-        description: 'You are a scout, and have free Search actions'
+        description: 'You are a scout, and move for half cost'
     },
     [PlayerColors[2]]: {
         title: 'Droid',
-        description: 'You are a memory droid, and can carry all 4 memory spheres at once'
+        description: 'You are a memory droid, and can carry 4 memory spheres at once, and move through vacuum spaces.'
     },
     [PlayerColors[3]]: {
         title: 'Decker',
-        description: 'You are a decker, and cause the virus to attack slower during your turn'
+        description: 'You are a decker, and cause the virus to attack slower during your turn and have free download actions'
     }
 }
 

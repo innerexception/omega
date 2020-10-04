@@ -61,7 +61,7 @@ export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
             r.exits.forEach(e=>e.isOpen=true)
         }
     })
-    onEndPlayerAction(match)
+    onEndPlayerAction(match, 'move')
 }
 
 export const onPassTurn = () => {
@@ -157,10 +157,11 @@ export const onMatchUpdated = (match:Match) => {
     })
 }
 
-export const onEndPlayerAction = (match:Match, action?:string) => {
+export const onEndPlayerAction = (match:Match, action:string) => {
     const me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
     if(action === 'repair' && me.color === PlayerColors[0]) me.actions++
-    if(action === 'search' && me.color === PlayerColors[1]) me.actions++
+    if(action === 'search' && me.color === PlayerColors[3]) me.actions++
+    if(action === 'move' && me.color === PlayerColors[1]) me.actions+=0.5
 
     me.actions--
     if(me.actions <= 0){

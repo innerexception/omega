@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Tilemaps, Geom } from "phaser";
 import { store } from "../../App";
 import { defaults } from '../../assets/Assets'
-import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air, TURN_LENGTH } from "../../enum";
+import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air, TURN_LENGTH, PlayerColors } from "../../enum";
 import Player from "./Interactable";
 import { onMatchUpdated, onEndPlayerAction, onMove, onShowItemPopup, onShowGravePopup } from "../uiManager/Thunks";
 import { DIRS } from "../generators/digger";
@@ -120,7 +120,9 @@ export default class RoomScene extends Scene {
                                 const ex = e.coords.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
                                 const ey = e.coords.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
                                 let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
-                                if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && neighbor.room.airState < Air.Vacuum){
+                                if(neighbor && 
+                                    !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && 
+                                    (neighbor.room.airState < Air.Vacuum || plData.color === PlayerColors[2])){
                                     if(!this.validMoves.includes(neighbor)){
                                         this.validMoves.push(neighbor)
                                         this.g.fillRectShape(neighbor.shape)
@@ -301,38 +303,38 @@ export default class RoomScene extends Scene {
                 if(g.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
             })
 
-            if(r.roomItem){
-                this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
-                if(r.roomItem === RoomItem.CoreMemory){
-                    this.map.putTileAt(7, r.roomX+2, r.roomY+2,false, 'items')
-                    this.map.putTileAt(7, r.roomX+2, r.roomY,false, 'items')
-                    this.map.putTileAt(7, r.roomX, r.roomY+2,false, 'items')
-                    match.spheres.forEach((s,i)=>{
-                        if(i==0) this.map.putTileAt(s, r.roomX+2, r.roomY+2,false, 'items')
-                        if(i==1) this.map.putTileAt(s, r.roomX+2, r.roomY,false, 'items')
-                        if(i==2) this.map.putTileAt(s, r.roomX, r.roomY+2,false, 'items')
-                    })
+            if(r.exits[0].isOpen || r.roomItem === RoomItem.CoreMemory){
+                if(r.roomItem){
+                    this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
+                    if(r.roomItem === RoomItem.CoreMemory){
+                        this.map.putTileAt(7, r.roomX+2, r.roomY+2,false, 'items')
+                        this.map.putTileAt(7, r.roomX+2, r.roomY,false, 'items')
+                        this.map.putTileAt(7, r.roomX, r.roomY+2,false, 'items')
+                        match.spheres.forEach((s,i)=>{
+                            if(i==0) this.map.putTileAt(s, r.roomX+2, r.roomY+2,false, 'items')
+                            if(i==1) this.map.putTileAt(s, r.roomX+2, r.roomY,false, 'items')
+                            if(i==2) this.map.putTileAt(s, r.roomX, r.roomY+2,false, 'items')
+                        })
+                    }
                 }
+                else{
+                    let existing = this.map.getTileAt(r.roomX, r.roomY)
+                    if(existing && existing.index !== -1){
+                        let pl = match.players.find(p=>p.roomX===r.roomX&&p.roomY===r.roomY)
+                        let pSprite = this.players.find(p=>p.id === pl.id)
+                        this.tweens.add({
+                            targets: pSprite,
+                            x: pSprite.x-8,
+                            y: pSprite.y-8,
+                            duration: 500,
+                            yoyo: true,
+                            ease: 'Stepped',
+                            easeParams: [3],
+                        })
+                    }
+                    this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')
+                } 
             }
-            else{
-                let existing = this.map.getTileAt(r.roomX, r.roomY)
-                if(existing && existing.index !== -1){
-                    let pl = match.players.find(p=>p.roomX===r.roomX&&p.roomY===r.roomY)
-                    let pSprite = this.players.find(p=>p.id === pl.id)
-                    this.tweens.add({
-                        targets: pSprite,
-                        x: pSprite.x-8,
-                        y: pSprite.y-8,
-                        duration: 500,
-                        yoyo: true,
-                        ease: 'Stepped',
-                        easeParams: [3],
-                    })
-                }
-                this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')
-            } 
-
-            
         })
     }
 }
