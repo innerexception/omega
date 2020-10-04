@@ -103,7 +103,7 @@ export const Icon = (iconName:string, large:boolean) =>
     <div style={{cursor:'pointer', 
         width:large ? '32px' : '20px', 
         height: large ? '32px' : '20px', 
-        backgroundImage: 'url('+Icons[iconName]+')', 
+        backgroundImage: 'url('+iconName+')', 
         backgroundPosition:'center',
         backgroundRepeat:'no-repeat', 
         backgroundSize: 'contain', 

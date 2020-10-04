@@ -1,7 +1,7 @@
 import * as v4 from 'uuid'
 import { Scene } from 'phaser';
 import RoomScene from './canvas/RoomScene';
-import { PlayerColors, RoomItem, RoomItems, Air } from '../enum';
+import { PlayerColors, RoomItem, RoomItems, Air, TURN_LENGTH } from '../enum';
 import Digger from "./generators/digger";
 
 enum FirebaseAuthError {
@@ -32,50 +32,46 @@ export const getNewMatchObject = (player:PlayerState) => {
         id:v4(),
         activePlayerId: player.id,
         isVictory: false,
-        rooms: generateStationRooms()
+        rooms: generateStationRooms(),
+        spheres: []
     }
     return match
 }
 
-export const playersHaveKeys = (coreRoom:RoomState, players:Array<PlayerState>) => {
-    const playersInRoom = players.filter(p=>p.roomX === coreRoom.roomX && p.roomY === coreRoom.roomY)
-    const playersInventory = playersInRoom.map(p=>p.inventory).reduce((acc, val)=>acc.concat(val), [])
-    return playersInventory.includes(RoomItem.BlueSphere) && playersInventory.includes(RoomItem.GreenSphere) && playersInventory.includes(RoomItem.PurpleSphere) && playersInventory.includes(RoomItem.RedSphere)
-}
-
 export const generateStationRooms = () => {
     let rooms = new Array<RoomState>()
-    let items = RoomItems
     const digger = new Digger(50,25, {corridorLength: [0,0], dugPercentage:0.3, roomWidth:[3,3], roomHeight:[3,3]})
     digger.create()
     digger.getRooms().forEach((room,i) => {
         var x = room._x1;
         var y = room._y1;
-        // var w = room.getRight() - room.getLeft()
-        // var h = room.getBottom() - room.getTop()
-        // var cx = room.getCenter()[0]
-        // var cy = room.getCenter()[1]
-        // var left = room.getLeft()
-        // var right = room.getRight()
-        // var top = room.getTop()
-        // var bottom = room.getBottom()
-
-        let exits = []
+        let exits = new Array<ExitState>()
         room.getDoors((dx,dy)=>{
             exits.push({
-                x: dx, y:dy
+                coords: {x:dx, y:dy},
+                isOpen:false
             })
         })
-
         rooms.push({
             roomX: x,
             roomY: y,
-            roomItem: items.length > 0 ? items.shift() : null,
+            roomItem: null,
             airState: Air.Normal,
             exits
         })
     });
+    for(let i=0; i<RoomItems.length;i++){
+        getEmptyRoom(rooms).roomItem = RoomItems[i]
+    }
     return rooms
+}
+
+const getEmptyRoom = (rooms:Array<RoomState>) => {
+    let room = rooms[Phaser.Math.Between(0,rooms.length-1)]
+    while(room.roomItem){
+        room = rooms[Phaser.Math.Between(0,rooms.length-1)]
+    }
+    return room
 }
 
 export const getNewPlayer = (name:string, uid:string) => {

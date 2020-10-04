@@ -1,6 +1,5 @@
 Omega Virus
 
-1. draw generated station map with players and items
 3. choose action: move, repair, search, (special: breach door. 0 move cost but area will decompress as one space)
 7. Players can't move through vacuum rooms without a suit
 
@@ -8,5 +7,7 @@ Omega Virus
 3. Add suit pickups for vacuum moves
 4. Fix occasional incorrect movement option
 5. Add player color special abilities
-6. Add popup for tile info: items, graves
-7. Add tooltips for buttons
+    -Green (Scout), Free Search Actions
+    -Blue (Engineer), Free Repair Actions
+    -Yellow (Hacker), Delay virus timer
+    -Red (Droid), Can carry all 4 spheres at once

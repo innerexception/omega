@@ -1,13 +1,20 @@
-import { UIReducerActions, Modal, Air, TURN_LENGTH, RoomItem } from '../../enum'
+import { UIReducerActions, Modal, Air, TURN_LENGTH, RoomItem, PlayerColors } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
 import { getNextPlayerId } from '../Util';
-import { strictEqual } from 'assert';
 
 export const onSearch = () => {
     dispatch({
         type: UIReducerActions.SEARCH
     })
+}
+
+export const onDepositSpheres = (spheres:Array<RoomItem>) => {
+    const match = store.getState().match
+    match.players.forEach(p=>{
+        if(p.id === match.activePlayerId) p.inventory = []
+    })
+    Provider.upsertMatch({...match, spheres: match.spheres.concat(spheres)})
 }
 
 export const onRepair = () => {
@@ -47,6 +54,11 @@ export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
         if(p.id === player.id){
             player.roomX = roomX
             player.roomY = roomY
+        }
+    })
+    match.rooms.forEach(r=>{
+        if(r.roomY===roomY && r.roomX===roomX){
+            r.exits.forEach(e=>e.isOpen=true)
         }
     })
     onEndPlayerAction(match)
@@ -111,7 +123,7 @@ export const onCreateMatch = async (name:string, player:PlayerState) => {
 export const onTurnTick = () => {
     let match = store.getState().match
     let me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
-    if(store.getState().matchTicks % TURN_LENGTH === 0){
+    if(store.getState().matchTicks % TURN_LENGTH(me.color) === 0){
         // match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
         // me.actions = 2
         match = virusAction(match)
@@ -145,8 +157,11 @@ export const onMatchUpdated = (match:Match) => {
     })
 }
 
-export const onEndPlayerAction = (match:Match) => {
+export const onEndPlayerAction = (match:Match, action?:string) => {
     const me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
+    if(action === 'repair' && me.color === PlayerColors[0]) me.actions++
+    if(action === 'search' && me.color === PlayerColors[1]) me.actions++
+
     me.actions--
     if(me.actions <= 0){
         match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
@@ -179,6 +194,7 @@ const virusAction = (match:Match) => {
             if(room.airState === Air.Vacuum){
                 let pl = match.players.find(p=>p.roomX === room.roomX && p.roomY === room.roomY)
                 if(pl){
+                    delete pl.actions
                     match.graves.push({...pl})
                 }
             }

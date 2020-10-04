@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { RoomItem, Air, TURN_LENGTH } from '../../enum';
+import { RoomItem, Air, TURN_LENGTH, PlayerColorData, PlayerColors } from '../../enum';
 import { connect } from 'react-redux';
-import { TileIcon, Button, TopBar, ProgressBar } from '../Shared';
-import { onSearch, onRepair, onStartMove, onKillVirus, onLeaveMatch, onPassTurn } from '../uiManager/Thunks';
-import AppStyles, { modalBg } from '../../AppStyles'
-import { playersHaveKeys } from '../Util';
+import { TileIcon, Button, TopBar, ProgressBar, Icon } from '../Shared';
+import { onSearch, onRepair, onStartMove, onKillVirus, onLeaveMatch, onPassTurn, onDepositSpheres } from '../uiManager/Thunks';
+import { modalBg } from '../../AppStyles'
+import Tooltip from 'rc-tooltip';
 const virus = require('../../assets/logo.png')
+const emptySphere = require('../../assets/emptySphere.png')
 
 interface Props {
     match?:Match
@@ -35,18 +36,22 @@ export default class Toolbar extends React.Component<Props> {
         return [
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginLeft:'1em', marginRight:'1em', marginBottom:'0.5em'}}>
                     <div>
-                        <h4 style={{color: activePlayer.color, textShadow:'1px 1px black'}}>{activePlayer.name}</h4>
+                        <Tooltip placement="bottom" mouseEnterDelay={1} overlay={<h5>{PlayerColorData[activePlayer.color].description}</h5>}>
+                            <h4 style={{color: activePlayer.color, textShadow:'2px 2px black', cursor:'pointer'}}>
+                                {activePlayer.name}
+                            </h4>
+                        </Tooltip>
                         <h4>{activePlayer.actions} Actions Left</h4>
                     </div>
                     <div style={{display:'flex', alignItems:'center'}}>
                         <h4 style={{marginRight:'0.5em'}}>Next Virus Attack:</h4>
-                        {ProgressBar(this.props.ticks % TURN_LENGTH, TURN_LENGTH, virus)}
+                        {ProgressBar(this.props.ticks % TURN_LENGTH(activePlayer.color), TURN_LENGTH(activePlayer.color), virus)}
                     </div>
                     <div>
                         <h4>Inventory</h4>
                         <div style={{display:'flex', justifyContent:'space-around', height:'24px'}}>
-                            {activePlayer.inventory.map(i=>
-                                TileIcon(i) 
+                            {new Array(activePlayer.color === PlayerColors[2] ? 4 : 1).fill({}).map((p,i)=>
+                                activePlayer.inventory[i] ? TileIcon(activePlayer.inventory[i]) : Icon(emptySphere, false)
                             )}
                         </div>
                     </div>
@@ -57,14 +62,18 @@ export default class Toolbar extends React.Component<Props> {
                     </div>
                     {!coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playerRoom && playerRoom.roomItem ? true : false, onSearch, '(S)earch', 'Pickup any item found in this room')}
+                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(S)earch', 'Pickup any item found in this room')}
                         </div>}
                     <div style={{marginRight:'0.5em'}}>
                         {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room')}
                     </div>
                     {coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playersHaveKeys(playerRoom, this.props.match.players), onKillVirus, '(K)ill Virus', 'With all 4 decryption spheres in hand, destroy the virus.')}
+                            {Button(this.props.match.spheres.length === 4, onKillVirus, '(K)ill Virus', 'With all 4 decryption spheres in hand, destroy the virus.')}
+                        </div>}
+                    {coreRoom && 
+                        <div style={{marginRight:'0.5em'}}>
+                            {Button(activePlayer.inventory.length > 0, ()=>onDepositSpheres(activePlayer.inventory), '(D)eposit Spheres', 'Drop off a carried sphere. Return once all 4 have been delivered.')}
                         </div>}
                     {Button(true, onPassTurn, '(P)ass', 'Skip your turn')}
                     {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
@@ -83,6 +92,11 @@ export default class Toolbar extends React.Component<Props> {
             </div>
         )
     }
+}
+
+const hasRoom = (player:PlayerState) => {
+    if(player.color === PlayerColors[2]) return true
+    else return player.inventory.length === 0
 }
 
 const style = {

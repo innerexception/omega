@@ -16,10 +16,11 @@ export enum UIReducerActions {
     START_MOVE,
     REPAIR,
     KILL_VIRUS,
-    MATCH_TICK
+    MATCH_TICK,
+    DEPOSIT
 }
 
-export const TURN_LENGTH = 15
+export const TURN_LENGTH = (color:string) => color === PlayerColors[3] ? 30 : 15
 
 export const FONT_DEFAULT = {
     fontFamily: 'Body', 
@@ -28,18 +29,30 @@ export const FONT_DEFAULT = {
 }
 
 export const PlayerColors = [
-    '#3D2F23',
-    '#974627',
-    '#B38B48',
-    '#DEBF78',
-    '#616D66',
-    '#F7B728',
-    '#63BB50',
-    '#6893C5',
-    '#F0E9B9',
-    '#DD9058'
+    '#55ffff', //blue
+    '#55ff55', //green
+    '#ff5555', //red
+    '#ffff55' //yellow
 ]
 
+export const PlayerColorData = {
+    [PlayerColors[0]]: {
+        title: 'Engineer',
+        description: 'You are an engineer, and have free repair actions',
+    },
+    [PlayerColors[1]]: {
+        title: 'Scout',
+        description: 'You are a scout, and have free Search actions'
+    },
+    [PlayerColors[2]]: {
+        title: 'Droid',
+        description: 'You are a memory droid, and can carry all 4 memory spheres at once'
+    },
+    [PlayerColors[3]]: {
+        title: 'Decker',
+        description: 'You are a decker, and cause the virus to attack slower during your turn'
+    }
+}
 
 export enum Modal {
     HELP,

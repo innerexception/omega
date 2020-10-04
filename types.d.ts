@@ -39,6 +39,7 @@ interface Match {
     graves: Array<GraveState>
     rooms: Array<RoomState>
     isVictory:boolean
+    spheres: Array<import('./enum').RoomItem>
 }
 
 interface RoomState {
@@ -46,7 +47,12 @@ interface RoomState {
     roomY:number
     roomItem?: import('./enum').RoomItem
     airState: import('./enum').Air
-    exits: Array<Tuple>
+    exits: Array<ExitState>
+}
+
+interface ExitState {
+    coords: Tuple
+    isOpen:boolean
 }
 
 interface RState {

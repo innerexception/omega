@@ -120,7 +120,7 @@ class Network {
                 match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
             }
             let pl = match.players.find(p=>p.id === playerId)
-            pl.inventory.forEach(i=>{
+            pl.inventory && pl.inventory.forEach(i=>{
                 let available = match.rooms.filter(r=>r.airState > Air.Vacuum)
                 let candidate = available[Phaser.Math.Between(0, available.length-1)]
                 if(candidate) candidate.roomItem = i

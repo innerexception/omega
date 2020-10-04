@@ -51,100 +51,102 @@ export default class RoomScene extends Scene {
     onReduxUpdate = () => {
         const uiState = store.getState()
         let engineEvent = uiState.engineEvent
-        let mySprite = this.players.find(p=>p.id === store.getState().onlineAccount.uid)
-        let plData = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
-        if(engineEvent)
-            switch(engineEvent.event){
-                case UIReducerActions.MATCH_UPDATED:
-                    if(this.initCompleted){
-                        this.redrawBoard(store.getState().match)
-                    }
-                    else this.time.addEvent({
-                        delay:2000,
-                        callback: ()=>{
-                            this.redrawBoard(engineEvent.data)
+        if(uiState.match){
+            let mySprite = this.players.find(p=>p.id === store.getState().onlineAccount.uid)
+            let plData = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
+            if(engineEvent)
+                switch(engineEvent.event){
+                    case UIReducerActions.MATCH_UPDATED:
+                        if(this.initCompleted){
+                            this.redrawBoard(store.getState().match)
                         }
-                    })
-                    break
-                case UIReducerActions.SEARCH:
-                    this.clearMovement()
-                    //Grab the item
-                    let rroom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
-                    const mmatch = {...uiState.match, players: uiState.match.players.map(p=>{
-                        if(p.id === uiState.onlineAccount.uid){
-                            return {...p, inventory: p.inventory.concat([rroom.roomItem])}
-                        }
-                        return p
-                    })}
-                    rroom.roomItem = null
-                    onEndPlayerAction(mmatch)
-                    break
-                case UIReducerActions.KILL_VIRUS:
-                    this.clearMovement()
-                    //Move character to top left corner of room
-                    this.tweens.add({
-                        targets: mySprite,
-                        x: mySprite.x-8,
-                        duration: 500,
-                        onComplete: ()=>{
-                            //End the game
-                            this.effects.get(mySprite.x, mySprite.y, 'hacking').setScale(0.5).play('hacking')
-                            let match = store.getState().match
-                            onMatchUpdated({...match, isVictory: true})
-                        }
-                    })
-                    break
-                case UIReducerActions.REPAIR:
-                    this.clearMovement()
-                    //Play welder animation
-                    let proom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
-                    const match = {...uiState.match, rooms: uiState.match.rooms.map(r=>{
-                        if(r.roomX === proom.roomX && r.roomY === proom.roomY){
-                            return {...r, airState: r.airState - 1 }
-                        }
-                        return r
-                    })}
-                    onEndPlayerAction(match)
-                    break
-                case UIReducerActions.START_MOVE:
-                    //Highlight adjacent rooms
-                    let room = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
-                    this.g.clear()
-                    if(this.validMoves.length > 0){
-                        this.validMoves = []
-                        return
-                    }
-                    room.exits.forEach(e=>{
-                        DIRS[4].forEach(dir=>{
-                            const ex = e.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
-                            const ey = e.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
-                            let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
-                            if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && neighbor.room.airState < Air.Vacuum){
-                                if(!this.validMoves.includes(neighbor)){
-                                    this.validMoves.push(neighbor)
-                                    this.g.fillRectShape(neighbor.shape)
-                                }
+                        else this.time.addEvent({
+                            delay:2000,
+                            callback: ()=>{
+                                this.redrawBoard(engineEvent.data)
                             }
                         })
-                    })
-                    break
-                case UIReducerActions.MATCH_TICK:
-                    if(uiState.matchTicks % TURN_LENGTH === 0){
-                        this.warningText = this.add.text(mySprite.x-74, mySprite.y-50, 'Virus damaging station!!', FONT_DEFAULT).setDepth(5)
-                        this.warningText.setStroke('#000000', 3);
+                        break
+                    case UIReducerActions.SEARCH:
+                        this.clearMovement()
+                        //Grab the item
+                        let rroom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                        const mmatch = {...uiState.match, players: uiState.match.players.map(p=>{
+                            if(p.id === uiState.onlineAccount.uid){
+                                return {...p, inventory: p.inventory.concat([rroom.roomItem])}
+                            }
+                            return p
+                        })}
+                        rroom.roomItem = null
+                        onEndPlayerAction(mmatch, 'search')
+                        break
+                    case UIReducerActions.KILL_VIRUS:
+                        this.clearMovement()
+                        //Move character to top left corner of room
                         this.tweens.add({
-                            targets: this.warningText,
-                            alpha: 0,
-                            duration:500,
-                            repeat: 3,
-                            ease: 'Stepped',
-                            easeParams: [3],
-                            yoyo:true,
-                            onComplete: ()=>this.warningText.destroy()
+                            targets: mySprite,
+                            x: mySprite.x-8,
+                            duration: 500,
+                            onComplete: ()=>{
+                                //End the game
+                                this.effects.get(mySprite.x, mySprite.y, 'hacking').setScale(0.5).play('hacking')
+                                let match = store.getState().match
+                                onMatchUpdated({...match, isVictory: true})
+                            }
                         })
-                    }
-                    break
-            }
+                        break
+                    case UIReducerActions.REPAIR:
+                        this.clearMovement()
+                        //Play welder animation
+                        let proom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                        const match = {...uiState.match, rooms: uiState.match.rooms.map(r=>{
+                            if(r.roomX === proom.roomX && r.roomY === proom.roomY){
+                                return {...r, airState: r.airState - 1 }
+                            }
+                            return r
+                        })}
+                        onEndPlayerAction(match, 'repair')
+                        break
+                    case UIReducerActions.START_MOVE:
+                        //Highlight adjacent rooms
+                        let room = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                        this.g.clear()
+                        if(this.validMoves.length > 0){
+                            this.validMoves = []
+                            return
+                        }
+                        room.exits.forEach(e=>{
+                            DIRS[4].forEach(dir=>{
+                                const ex = e.coords.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
+                                const ey = e.coords.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
+                                let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
+                                if(neighbor && !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && neighbor.room.airState < Air.Vacuum){
+                                    if(!this.validMoves.includes(neighbor)){
+                                        this.validMoves.push(neighbor)
+                                        this.g.fillRectShape(neighbor.shape)
+                                    }
+                                }
+                            })
+                        })
+                        break
+                    case UIReducerActions.MATCH_TICK:
+                        if(uiState.matchTicks % TURN_LENGTH(plData.color) === 0){
+                            this.warningText = this.add.text(mySprite.x-74, mySprite.y-50, 'Virus damaging station!!', FONT_DEFAULT).setDepth(5)
+                            this.warningText.setStroke('#000000', 3);
+                            this.tweens.add({
+                                targets: this.warningText,
+                                alpha: 0,
+                                duration:500,
+                                repeat: 3,
+                                ease: 'Stepped',
+                                easeParams: [3],
+                                yoyo:true,
+                                onComplete: ()=>this.warningText.destroy()
+                            })
+                        }
+                        break
+                }
+        }
     }
 
     clearMovement = () => {
@@ -203,6 +205,9 @@ export default class RoomScene extends Scene {
             else if(GameObjects[0] && GameObjects[0].isDead) {
                 onShowGravePopup(store.getState().match.graves.find(g=>g.id === GameObjects[0].id))
             }
+            else if(GameObjects[0]){
+                onShowGravePopup(store.getState().match.players.find(g=>g.id === GameObjects[0].id))
+            }
         })
         this.initCompleted = true
     }
@@ -217,18 +222,25 @@ export default class RoomScene extends Scene {
             let shakem = new Array<Tilemaps.Tile>()
             let fixem = new Array<Tilemaps.Tile>()
             let weldem
-            for(var x=r.roomX; x<r.roomX+ROOM_DIM; x++){
-                for(var y=r.roomY;y<r.roomY+ROOM_DIM;y++){
-                    let existing = this.map.getTileAt(x,y,false,'terrain')
-                    if(existing && existing.index !== 9){
-                        if(existing.index < r.airState) shakem.push(existing)
-                        if(existing.index > r.airState){
-                            fixem.push(existing)
-                            weldem = this.map.getTileAt(r.roomX+1,r.roomY+1, false, 'terrain')
-                        }
-                    } 
-                    this.map.putTileAt(r.airState, x,y, false, 'terrain')
+            if(r.exits[0].isOpen || r.roomItem === RoomItem.CoreMemory){
+                for(var x=r.roomX; x<r.roomX+ROOM_DIM; x++){
+                    for(var y=r.roomY;y<r.roomY+ROOM_DIM;y++){
+                        let existing = this.map.getTileAt(x,y,false,'terrain')
+                        if(existing && existing.index !== 9){
+                            if(existing.index < r.airState) shakem.push(existing)
+                            if(existing.index > r.airState){
+                                fixem.push(existing)
+                                weldem = this.map.getTileAt(r.roomX+1,r.roomY+1, false, 'terrain')
+                            }
+                        } 
+                        this.map.putTileAt(r.airState, x,y, false, 'terrain')
+                    }
                 }
+                this.map.putTileAt(RoomItem.Logo, r.roomX+1,r.roomY+1,false,'terrain')
+                r.exits.forEach(e=>{
+                    this.map.putTileAt(0, e.coords.x,e.coords.y, false, 'terrain')
+                    this.map.putTileAt(e.isOpen ? 13 : 12, e.coords.x,e.coords.y, false, 'items')
+                })
             }
             
             if(weldem){
@@ -269,11 +281,6 @@ export default class RoomScene extends Scene {
                 })
             })
             
-            this.map.putTileAt(RoomItem.Logo, r.roomX+1,r.roomY+1,false,'terrain')
-            r.exits.forEach(e=>{
-                this.map.putTileAt(0, e.x,e.y, false, 'terrain')
-                this.map.putTileAt(7, e.x,e.y, false, 'items')
-            })
 
             let p = match.players.filter(p=>p.roomY===r.roomY && p.roomX === r.roomX)
             p.forEach((p,i)=>{
@@ -296,6 +303,16 @@ export default class RoomScene extends Scene {
 
             if(r.roomItem){
                 this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
+                if(r.roomItem === RoomItem.CoreMemory){
+                    this.map.putTileAt(7, r.roomX+2, r.roomY+2,false, 'items')
+                    this.map.putTileAt(7, r.roomX+2, r.roomY,false, 'items')
+                    this.map.putTileAt(7, r.roomX, r.roomY+2,false, 'items')
+                    match.spheres.forEach((s,i)=>{
+                        if(i==0) this.map.putTileAt(s, r.roomX+2, r.roomY+2,false, 'items')
+                        if(i==1) this.map.putTileAt(s, r.roomX+2, r.roomY,false, 'items')
+                        if(i==2) this.map.putTileAt(s, r.roomX, r.roomY+2,false, 'items')
+                    })
+                }
             }
             else{
                 let existing = this.map.getTileAt(r.roomX, r.roomY)
@@ -317,16 +334,5 @@ export default class RoomScene extends Scene {
 
             
         })
-    }
-
-
-    tryShowTileInfo = () => {
-        let tile = this.map.getTileAtWorldXY(
-            this.input.activePointer.worldX, 
-            this.input.activePointer.worldY, false, undefined, 'tiles')
-        if(tile) {
-            //let type = Object.keys(CardTypes).find((type:TileType)=>CardTypes[type].spriteIndex === tile.index)
-            //onShowTilePopup(type as TileType)
-        }
     }
 }
