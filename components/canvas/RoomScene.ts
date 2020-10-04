@@ -52,6 +52,7 @@ export default class RoomScene extends Scene {
         const uiState = store.getState()
         let engineEvent = uiState.engineEvent
         let mySprite = this.players.find(p=>p.id === store.getState().onlineAccount.uid)
+        let plData = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
         if(engineEvent)
             switch(engineEvent.event){
                 case UIReducerActions.MATCH_UPDATED:
@@ -66,27 +67,16 @@ export default class RoomScene extends Scene {
                     })
                     break
                 case UIReducerActions.SEARCH:
-                    //Move character to top left corner of room
-                    this.tweens.add({
-                        targets: mySprite,
-                        x: mySprite.x-8,
-                        y: mySprite.y-8,
-                        duration: 500,
-                        onComplete: ()=>{
-                            //Grab the item
-                            const state = store.getState()
-                            let plData = state.match.players.find(p=>p.id === state.onlineAccount.uid)
-                            let room = state.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
-                            const match = {...state.match, players: state.match.players.map(p=>{
-                                if(p.id === state.onlineAccount.uid){
-                                    return {...p, inventory: p.inventory.concat([room.roomItem])}
-                                }
-                                return p
-                            })}
-                            room.roomItem = null
-                            onEndPlayerAction(match)
+                    //Grab the item
+                    let rroom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                    const mmatch = {...uiState.match, players: uiState.match.players.map(p=>{
+                        if(p.id === uiState.onlineAccount.uid){
+                            return {...p, inventory: p.inventory.concat([rroom.roomItem])}
                         }
-                    })
+                        return p
+                    })}
+                    rroom.roomItem = null
+                    onEndPlayerAction(mmatch)
                     break
                 case UIReducerActions.KILL_VIRUS:
                     //Move character to top left corner of room
@@ -104,8 +94,7 @@ export default class RoomScene extends Scene {
                     break
                 case UIReducerActions.REPAIR:
                     //Play welder animation
-                    let plDat = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
-                    let proom = uiState.match.rooms.find(r=>r.roomX===plDat.roomX && r.roomY === plDat.roomY)
+                    let proom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     const match = {...uiState.match, rooms: uiState.match.rooms.map(r=>{
                         if(r.roomX === proom.roomX && r.roomY === proom.roomY){
                             return {...r, airState: r.airState - 1 }
@@ -116,7 +105,6 @@ export default class RoomScene extends Scene {
                     break
                 case UIReducerActions.START_MOVE:
                     //Highlight adjacent rooms
-                    let plData = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
                     let room = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     this.g.clear()
                     room.exits.forEach(e=>{
@@ -248,11 +236,6 @@ export default class RoomScene extends Scene {
                 this.map.putTileAt(7, e.x,e.y, false, 'items')
             })
 
-            if(r.roomItem){
-                this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
-            }
-            else this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')
-
             let p = match.players.filter(p=>p.roomY===r.roomY && p.roomX === r.roomX)
             p.forEach((p,i)=>{
                 let g = match.graves.find(g=>g.id === p.id)
@@ -271,6 +254,27 @@ export default class RoomScene extends Scene {
                 this.graves.push(pl)
                 if(g.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
             })
+
+            if(r.roomItem){
+                this.map.putTileAt(r.roomItem, r.roomX, r.roomY, false, 'items')
+            }
+            else{
+                let existing = this.map.getTileAt(r.roomX, r.roomY)
+                if(existing && existing.index !== -1){
+                    let pl = match.players.find(p=>p.roomX===r.roomX&&p.roomY===r.roomY)
+                    let pSprite = this.players.find(p=>p.id === pl.id)
+                    this.tweens.add({
+                        targets: pSprite,
+                        x: pSprite.x-8,
+                        y: pSprite.y-8,
+                        duration: 500,
+                        yoyo: true
+                    })
+                }
+                this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')
+            } 
+
+            
         })
     }
 
