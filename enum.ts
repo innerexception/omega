@@ -19,7 +19,7 @@ export enum UIReducerActions {
     MATCH_TICK
 }
 
-export const TURN_LENGTH = 30
+export const TURN_LENGTH = 15
 
 export const FONT_DEFAULT = {
     fontFamily: 'Body', 

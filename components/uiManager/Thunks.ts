@@ -89,8 +89,8 @@ export const onTurnTick = () => {
     let match = store.getState().match
     let me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
     if(store.getState().matchTicks % TURN_LENGTH === 0){
-        match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
-        me.actions = 2
+        // match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
+        // me.actions = 2
         match = virusAction(match)
         Provider.upsertMatch(match)
         dispatch({
@@ -148,9 +148,9 @@ export const onUpdatePlayerName = (name:string) => {
 
 const virusAction = (match:Match) => {
     //Virus action
+    let eligibleRooms = match.rooms.filter(r=>r.airState<Air.Vacuum)
     for(let i=0; i<match.players.length+3; i++){
-        let eligibleRooms = match.rooms.filter(r=>r.airState<Air.Vacuum)
-        let room = eligibleRooms[Phaser.Math.Between(0,eligibleRooms.length-1)]
+        let room = eligibleRooms.splice(Phaser.Math.Between(0,eligibleRooms.length-1), 1)[0]
         if(room){
             room.airState++
             if(room.airState === Air.Vacuum){

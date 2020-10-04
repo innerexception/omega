@@ -104,28 +104,20 @@ export default class RoomScene extends Scene {
                     break
                 case UIReducerActions.REPAIR:
                     //Play welder animation
-                    this.effects.get(mySprite.x, mySprite.y, 'welding').setScale(0.5).play('welding')
-                    this.time.addEvent({
-                        delay:1000,
-                        callback: ()=> {
-                            const state = store.getState()
-                            let plData = state.match.players.find(p=>p.id === state.onlineAccount.uid)
-                            let room = state.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
-                            const match = {...state.match, rooms: state.match.rooms.map(r=>{
-                                if(r.roomX === room.roomX && r.roomY === room.roomY){
-                                    return {...r, airState: r.airState - 1 }
-                                }
-                                return r
-                            })}
-                            onEndPlayerAction(match)
+                    let plDat = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
+                    let proom = uiState.match.rooms.find(r=>r.roomX===plDat.roomX && r.roomY === plDat.roomY)
+                    const match = {...uiState.match, rooms: uiState.match.rooms.map(r=>{
+                        if(r.roomX === proom.roomX && r.roomY === proom.roomY){
+                            return {...r, airState: r.airState - 1 }
                         }
-                    })
+                        return r
+                    })}
+                    onEndPlayerAction(match)
                     break
                 case UIReducerActions.START_MOVE:
                     //Highlight adjacent rooms
-                    const state = store.getState()
-                    let plData = state.match.players.find(p=>p.id === state.onlineAccount.uid)
-                    let room = state.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
+                    let plData = uiState.match.players.find(p=>p.id === uiState.onlineAccount.uid)
+                    let room = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     this.g.clear()
                     room.exits.forEach(e=>{
                         DIRS[4].forEach(dir=>{
@@ -199,11 +191,57 @@ export default class RoomScene extends Scene {
         this.roomShapes = []
         match.rooms.forEach(r=>{
             this.roomShapes.push({room:r, shape: new Geom.Rectangle(r.roomX*TILE_WIDTH, r.roomY*TILE_WIDTH, 3*TILE_WIDTH,3*TILE_WIDTH)})
+            let shakem = new Array<Tilemaps.Tile>()
+            let fixem = new Array<Tilemaps.Tile>()
+            let weldem
             for(var x=r.roomX; x<r.roomX+ROOM_DIM; x++){
                 for(var y=r.roomY;y<r.roomY+ROOM_DIM;y++){
+                    let existing = this.map.getTileAt(x,y,false,'terrain')
+                    if(existing && existing.index !== 9){
+                        if(existing.index < r.airState) shakem.push(existing)
+                        if(existing.index > r.airState){
+                            fixem.push(existing)
+                            weldem = this.map.getTileAt(r.roomX+1,r.roomY+1, false, 'terrain')
+                        }
+                    } 
                     this.map.putTileAt(r.airState, x,y, false, 'terrain')
                 }
             }
+            
+            if(weldem){
+                this.effects.get(weldem.pixelX, weldem.pixelY, 'welding').setScale(0.5).play('welding')
+            }
+
+            shakem.forEach(t=>{
+                this.tweens.add({
+                    targets: t,
+                    pixelX: {
+                        from: t.pixelX+Phaser.Math.Between(-2,2),
+                        to: t.pixelX
+                    },
+                    pixelY: {
+                        from: t.pixelY+Phaser.Math.Between(-2,2),
+                        to: t.pixelY
+                    },
+                    repeat:4,
+                    duration: 100
+                })
+            })
+            fixem.forEach(t=>{
+                this.tweens.add({
+                    targets: t,
+                    pixelX: {
+                        from: t.pixelX+Phaser.Math.Between(-4,4),
+                        to: t.pixelX
+                    },
+                    pixelY: {
+                        from: t.pixelY+Phaser.Math.Between(-4,4),
+                        to: t.pixelY
+                    },
+                    duration: 250
+                })
+            })
+            
             this.map.putTileAt(RoomItem.Logo, r.roomX+1,r.roomY+1,false,'terrain')
             r.exits.forEach(e=>{
                 this.map.putTileAt(0, e.x,e.y, false, 'terrain')
@@ -235,6 +273,7 @@ export default class RoomScene extends Scene {
             })
         })
     }
+
 
     tryShowTileInfo = () => {
         let tile = this.map.getTileAtWorldXY(
