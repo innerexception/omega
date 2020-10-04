@@ -3,7 +3,7 @@ import { store } from "../../App";
 import { defaults } from '../../assets/Assets'
 import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air, TURN_LENGTH, PlayerColors } from "../../enum";
 import Player from "./Interactable";
-import { onMatchUpdated, onEndPlayerAction, onMove, onShowItemPopup, onShowGravePopup } from "../uiManager/Thunks";
+import { onMatchUpdated, onEndPlayerAction, onMove, onShowItemPopup, onShowGravePopup, onStartMove, onRepair, onKillVirus, onPassTurn, onLeaveMatch, onDepositSpheres, onSearch } from "../uiManager/Thunks";
 import { DIRS } from "../generators/digger";
 const ROOM_DIM = 3
 const TILE_WIDTH=16
@@ -117,8 +117,10 @@ export default class RoomScene extends Scene {
                         }
                         room.exits.forEach(e=>{
                             DIRS[4].forEach(dir=>{
-                                const ex = e.coords.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
-                                const ey = e.coords.y*TILE_WIDTH+(dir[1]*TILE_WIDTH)
+                                let ex = (e.coords.x*TILE_WIDTH)+(dir[0]*TILE_WIDTH/2)+(dir[0]*8)
+                                if(dir[0] === 0) ex+=8
+                                let ey = (e.coords.y*TILE_WIDTH)+(dir[1]*TILE_WIDTH/2)+(dir[1]*8)
+                                if(dir[1] === 0) ey+=8
                                 let neighbor = this.roomShapes.find(s=>s.shape.contains(ex,ey))
                                 if(neighbor && 
                                     !(neighbor.room.roomX === plData.roomX && neighbor.room.roomY === plData.roomY) && 
@@ -182,15 +184,38 @@ export default class RoomScene extends Scene {
         });
         this.effects = this.add.group()
         
-        // setSelectIconPosition(this, this.selectedTile)
         this.input.mouse.disableContextMenu()
 
-        this.input.on('pointerup', (event, gameObjects) => {
-            
+        this.input.keyboard.on('keydown-M', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onStartMove()
         })
-        this.input.on('pointermove', (event, gameObjects) => {
-            
+        this.input.keyboard.on('keydown-R', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onRepair()
         })
+        this.input.keyboard.on('keydown-K', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onKillVirus()
+        })
+        this.input.keyboard.on('keydown-P', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onPassTurn()
+        })
+        this.input.keyboard.on('keydown-Q', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onLeaveMatch()
+        })
+        this.input.keyboard.on('keydown-D', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onDepositSpheres()
+        })
+        this.input.keyboard.on('keydown-U', (event) => {
+            const state = store.getState()
+            if(state.match.activePlayerId === state.onlineAccount.uid) onSearch()
+        })
+        
+
         this.input.on('pointerdown', (event, GameObjects) => {
             const move = this.validMoves.find(m=>m.shape.contains(this.input.activePointer.worldX, this.input.activePointer.worldY))
             if(move){

@@ -38,17 +38,17 @@ export default class Toolbar extends React.Component<Props> {
                     <div>
                         <Tooltip placement="bottom" mouseEnterDelay={1} overlay={<h5>{PlayerColorData[activePlayer.color].description}</h5>}>
                             <h4 style={{color: activePlayer.color, textShadow:'2px 2px black', cursor:'pointer'}}>
-                                {activePlayer.name}
+                                {activePlayer.name} : {PlayerColorData[activePlayer.color].title}
                             </h4>
                         </Tooltip>
-                        <h4>{activePlayer.actions} Actions Left</h4>
+                        <h4 style={{textShadow:'2px 2px black'}}>{activePlayer.actions} Actions Left</h4>
                     </div>
                     <div style={{display:'flex', alignItems:'center'}}>
-                        <h4 style={{marginRight:'0.5em'}}>Next Virus Attack:</h4>
+                        <h4 style={{marginRight:'0.5em', textShadow:'2px 2px black',}}>Next Virus Attack:</h4>
                         {ProgressBar(this.props.ticks % TURN_LENGTH(activePlayer.color), TURN_LENGTH(activePlayer.color), virus)}
                     </div>
                     <div>
-                        <h4>Inventory</h4>
+                        <h4 style={{textShadow:'2px 2px black'}}>Spheres</h4>
                         <div style={{display:'flex', justifyContent:'space-around', height:'24px'}}>
                             {new Array(activePlayer.color === PlayerColors[2] ? 4 : 1).fill({}).map((p,i)=>
                                 activePlayer.inventory[i] ? TileIcon(activePlayer.inventory[i]) : Icon(emptySphere, false)
@@ -62,7 +62,7 @@ export default class Toolbar extends React.Component<Props> {
                     </div>
                     {!coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(D)ownload', 'Pickup a decryption sphere found in this room. Only the droid can carry more than 1 at a time.')}
+                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(U)pload', 'Pickup a decryption sphere found in this room. Only the droid can carry more than 1 at a time.')}
                         </div>}
                     <div style={{marginRight:'0.5em'}}>
                         {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room. Free for engineers.')}
@@ -71,10 +71,11 @@ export default class Toolbar extends React.Component<Props> {
                         <div style={{marginRight:'0.5em'}}>
                             {Button(this.props.match.spheres.length === 4, onKillVirus, '(K)ill Virus', 'With all 4 decryption spheres in hand, destroy the virus.')}
                         </div>}
-                    {coreRoom && 
+                    {coreRoom && activePlayer.inventory.length > 0 &&
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(activePlayer.inventory.length > 0, ()=>onDepositSpheres(activePlayer.inventory), '(D)eposit Spheres', 'Drop off a carried sphere. Return once all 4 have been delivered.')}
+                            {Button(true, ()=>onDepositSpheres(), '(D)eposit Spheres', 'Drop off a carried sphere. Return once all 4 have been delivered.')}
                         </div>}
+                    {Button(true, onPassTurn, '(P)ass', 'Skip your turn')}
                     {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
                 </div>
         ]

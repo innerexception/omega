@@ -9,10 +9,14 @@ export const onSearch = () => {
     })
 }
 
-export const onDepositSpheres = (spheres:Array<RoomItem>) => {
+export const onDepositSpheres = () => {
+    let spheres = []
     const match = store.getState().match
     match.players.forEach(p=>{
-        if(p.id === match.activePlayerId) p.inventory = []
+        if(p.id === match.activePlayerId){
+            spheres = p.inventory
+            p.inventory = []
+        } 
     })
     Provider.upsertMatch({...match, spheres: match.spheres.concat(spheres)})
 }
@@ -162,6 +166,7 @@ export const onEndPlayerAction = (match:Match, action:string) => {
     if(action === 'repair' && me.color === PlayerColors[0]) me.actions++
     if(action === 'search' && me.color === PlayerColors[3]) me.actions++
     if(action === 'move' && me.color === PlayerColors[1]) me.actions+=0.5
+    if(action === 'move' && me.color === PlayerColors[2]) me.actions-=1
 
     me.actions--
     if(me.actions <= 0){
