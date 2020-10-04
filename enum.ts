@@ -46,7 +46,7 @@ export const PlayerColorData = {
     },
     [PlayerColors[2]]: {
         title: 'Droid',
-        description: 'You are a memory droid, and can carry 4 memory spheres at once, and move through vacuum spaces. However, you move very slowly.'
+        description: 'You are an assault droid, and can carry 4 memory spheres at once, and move through vacuum spaces. However, you move very slowly.'
     },
     [PlayerColors[3]]: {
         title: 'Decker',

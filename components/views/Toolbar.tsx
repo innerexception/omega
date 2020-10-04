@@ -5,7 +5,7 @@ import { TileIcon, Button, TopBar, ProgressBar, Icon } from '../Shared';
 import { onSearch, onRepair, onStartMove, onKillVirus, onLeaveMatch, onPassTurn, onDepositSpheres } from '../uiManager/Thunks';
 import { modalBg } from '../../AppStyles'
 import Tooltip from 'rc-tooltip';
-const virus = require('../../assets/logo.png')
+const virus = require('../../assets/bg.png')
 const emptySphere = require('../../assets/emptySphere.png')
 
 interface Props {
@@ -34,8 +34,8 @@ export default class Toolbar extends React.Component<Props> {
             return <h4>{activePlayer.name}'s Turn</h4>
 
         return [
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginLeft:'1em', marginRight:'1em', marginBottom:'0.5em'}}>
-                    <div>
+                <div style={{display:'flex', alignItems:'center', marginBottom:'0.5em'}}>
+                    <div style={{background:'gray', padding:'5px', border:'1px solid', marginRight:'1em'}}>
                         <Tooltip placement="bottom" mouseEnterDelay={1} overlay={<h5>{PlayerColorData[activePlayer.color].description}</h5>}>
                             <h4 style={{color: activePlayer.color, textShadow:'2px 2px black', cursor:'pointer'}}>
                                 {activePlayer.name} : {PlayerColorData[activePlayer.color].title}
@@ -43,11 +43,7 @@ export default class Toolbar extends React.Component<Props> {
                         </Tooltip>
                         <h4 style={{textShadow:'2px 2px black'}}>{activePlayer.actions} Actions Left</h4>
                     </div>
-                    <div style={{display:'flex', alignItems:'center'}}>
-                        <h4 style={{marginRight:'0.5em', textShadow:'2px 2px black',}}>Next Virus Attack:</h4>
-                        {ProgressBar(this.props.ticks % TURN_LENGTH(activePlayer.color), TURN_LENGTH(activePlayer.color), virus)}
-                    </div>
-                    <div>
+                    <div style={{background:'gray', padding:'5px', border:'1px solid', marginRight:'1em'}}>
                         <h4 style={{textShadow:'2px 2px black'}}>Spheres</h4>
                         <div style={{display:'flex', justifyContent:'space-around', height:'24px'}}>
                             {new Array(activePlayer.color === PlayerColors[2] ? 4 : 1).fill({}).map((p,i)=>
@@ -55,18 +51,23 @@ export default class Toolbar extends React.Component<Props> {
                             )}
                         </div>
                     </div>
+                    <div style={{background:'gray', padding:'5px', border:'1px solid'}}>
+                        <h4 style={{marginRight:'0.5em', textShadow:'2px 2px black',}}>Next Virus Attack:</h4>
+                        {ProgressBar(this.props.ticks % TURN_LENGTH(activePlayer.color), TURN_LENGTH(activePlayer.color), virus)}
+                    </div>
                 </div>,
-                <div style={{display:'flex', alignItems:"center",  justifyContent:'space-evenly'}}>
-                    <div style={{marginRight:'0.5em', marginLeft:'0.5em'}}>
+                <div style={{display:'flex', alignItems:"center", justifyContent:'space-between'}}>
+                    <div style={{marginRight:'0.5em'}}>
                         {Button(true, onStartMove, '(M)ove')}
                     </div>
                     {!coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(U)pload', 'Pickup a decryption sphere found in this room. Only the droid can carry more than 1 at a time.')}
+                            {Button(playerRoom && playerRoom.roomItem && hasRoom(activePlayer) ? true : false, onSearch, '(U)pload', 'Upload a decryption sphere found in this room. Only the droid can carry more than 1 at a time.')}
                         </div>}
-                    <div style={{marginRight:'0.5em'}}>
-                        {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room. Free for engineers.')}
-                    </div>
+                    {playerRoom && playerRoom.airState > Air.Normal && 
+                        <div style={{marginRight:'0.5em'}}>
+                            {Button(true, onRepair, '(R)epair', 'Repair damage to this room. Free for engineers.')}
+                        </div>}
                     {coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
                             {Button(this.props.match.spheres.length === 4, onKillVirus, '(K)ill Virus', 'With all 4 decryption spheres in hand, destroy the virus.')}
@@ -75,16 +76,17 @@ export default class Toolbar extends React.Component<Props> {
                         <div style={{marginRight:'0.5em'}}>
                             {Button(true, ()=>onDepositSpheres(), '(D)eposit Spheres', 'Drop off a carried sphere. Return once all 4 have been delivered.')}
                         </div>}
-                    {Button(true, onPassTurn, '(P)ass', 'Skip your turn')}
+                        <div style={{marginRight:'0.5em'}}>{Button(true, onPassTurn, '(P)ass', 'Skip your turn')}</div>
                     {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
                 </div>
         ]
     }
 
     render(){
+        const activePlayer = this.props.match.players.find(p=>p.id === this.props.match.activePlayerId)
         return (
-            <div style={{width:'100%'}}>
-                <div style={style}>
+            <div style={{display:'flex', justifyContent:"center"}}>
+                <div style={{...style, backgroundColor: activePlayer.color}}>
                     <div>
                         {this.getViewComponent()}
                     </div>
@@ -101,11 +103,10 @@ const hasRoom = (player:PlayerState) => {
 
 const style = {
     backgroundImage: 'url('+modalBg+')',
-    backgroundColor: 'black',
-    border: '6px double',
-    borderRadius:'1em',
+    backgroundBlendMode:'hard-light',
     color:'white',
-    margin:'0.5em',
+    border:'2px solid',
+    borderRadius:'1em',
     marginBottom:0,
     padding:'0.5em'
 }

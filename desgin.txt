@@ -4,10 +4,3 @@ Omega Virus
 7. Players can't move through vacuum rooms without a suit
 
 2. Make sure players who leave/die drop their inventory
-3. Add suit pickups for vacuum moves
-4. Fix occasional incorrect movement option
-5. Add player color special abilities
-    -Green (Scout), Free Search Actions
-    -Blue (Engineer), Free Repair Actions
-    -Yellow (Hacker), Delay virus timer
-    -Red (Droid), Can carry all 4 spheres at once

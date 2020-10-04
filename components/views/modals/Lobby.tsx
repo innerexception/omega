@@ -1,6 +1,6 @@
 import * as React from 'react'
 import AppStyles from '../../../AppStyles';
-import { Button } from '../../Shared';
+import { Button, TileIcon } from '../../Shared';
 import { onCreateMatch, onJoinMatch } from '../../uiManager/Thunks';
 import { getNewPlayer } from '../../Util';
 import Provider from '../../../firebase/Network';
@@ -49,7 +49,7 @@ export default class Lobby extends React.Component<Props,State> {
             <div style={{...AppStyles.modal, justifyContent:'space-between'}}>
                 <div>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop:'5px'}}>
-                        <h2>Stations</h2>
+                        <h2>Station Prep</h2>
                         <div style={{width:'100px'}}>{Button(true, ()=>Provider.logoutUser(), 'Logout')}</div>
                     </div>
                     <hr/>

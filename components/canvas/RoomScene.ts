@@ -135,18 +135,20 @@ export default class RoomScene extends Scene {
                         break
                     case UIReducerActions.MATCH_TICK:
                         if(uiState.matchTicks % TURN_LENGTH(plData.color) === 0){
-                            this.warningText = this.add.text(mySprite.x-74, mySprite.y-50, 'Virus damaging station!!', FONT_DEFAULT).setDepth(5)
-                            this.warningText.setStroke('#000000', 3);
-                            this.tweens.add({
-                                targets: this.warningText,
-                                alpha: 0,
-                                duration:500,
-                                repeat: 3,
-                                ease: 'Stepped',
-                                easeParams: [3],
-                                yoyo:true,
-                                onComplete: ()=>this.warningText.destroy()
-                            })
+                            if(mySprite){
+                                this.warningText = this.add.text(mySprite.x-74, mySprite.y-50, 'Virus damaging station!!', FONT_DEFAULT).setDepth(5)
+                                this.warningText.setStroke('#000000', 3);
+                                this.tweens.add({
+                                    targets: this.warningText,
+                                    alpha: 0,
+                                    duration:500,
+                                    repeat: 3,
+                                    ease: 'Stepped',
+                                    easeParams: [3],
+                                    yoyo:true,
+                                    onComplete: ()=>this.warningText.destroy()
+                                })
+                            }
                         }
                         break
                 }
@@ -167,7 +169,14 @@ export default class RoomScene extends Scene {
         this.cameras.main.setZoom(2)
         this.map = this.add.tilemap(undefined, TILE_WIDTH,TILE_WIDTH, 100,100)
         let baseTiles = this.map.addTilesetImage('base-tiles', 'base-tiles', TILE_WIDTH,TILE_WIDTH)
-        this.add.tileSprite(this.cameras.main.centerX, this.cameras.main.centerY,2000,2000, 'tiny2')
+        let spr1 = this.add.tileSprite(this.cameras.main.centerX, this.cameras.main.centerY,1000,1000, 'tiny2')
+        this.time.addEvent({
+            delay:500,
+            callback: () => {
+                spr1.setTilePosition(spr1.tilePositionX+2, spr1.tilePositionY+2)
+            },
+            repeat: -1
+        })
         this.map.createBlankDynamicLayer('terrain', baseTiles)
         this.map.createBlankDynamicLayer('items', baseTiles)
         this.anims.create({
@@ -215,7 +224,6 @@ export default class RoomScene extends Scene {
             if(state.match.activePlayerId === state.onlineAccount.uid) onSearch()
         })
         
-
         this.input.on('pointerdown', (event, GameObjects) => {
             const move = this.validMoves.find(m=>m.shape.contains(this.input.activePointer.worldX, this.input.activePointer.worldY))
             if(move){
@@ -271,7 +279,7 @@ export default class RoomScene extends Scene {
             }
             
             if(weldem){
-                this.effects.get(weldem.pixelX, weldem.pixelY, 'welding').setScale(0.5).play('welding')
+                this.effects.get(weldem.pixelX, weldem.pixelY, 'welding').setScale(0.5).setDepth(2).play('welding')
             }
 
             shakem.forEach(t=>{
