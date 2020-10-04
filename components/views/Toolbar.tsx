@@ -24,6 +24,8 @@ export default class Toolbar extends React.Component<Props> {
         const playerRoom = this.props.match.rooms.find(r=>r.roomX === activePlayer.roomX && r.roomY === activePlayer.roomY)
         const coreRoom = playerRoom && playerRoom.roomItem === RoomItem.CoreMemory
 
+        if(this.props.match.isVictory) 
+            return Button(true, onLeaveMatch, 'Mission Success')
         if(this.props.match.graves.find(g=>g.id === this.props.me.uid)) 
             return Button(true, onLeaveMatch, 'R.I.P')
         if(activePlayer.id !== this.props.me.uid)

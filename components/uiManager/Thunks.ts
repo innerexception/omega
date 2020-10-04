@@ -23,9 +23,7 @@ export const onStartMove = () => {
 }
 
 export const onKillVirus = () => {
-    dispatch({
-        type: UIReducerActions.KILL_VIRUS
-    })
+    Provider.upsertMatch({...store.getState().match, isVictory: true})
 }
 
 export const onMove = (player:PlayerState, roomX:number, roomY:number) => {

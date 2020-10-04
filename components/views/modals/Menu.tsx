@@ -59,7 +59,6 @@ export default class Menu extends React.Component<Props, State> {
                                     <div style={{width:'100px', marginLeft:'1em'}}>{Button(!this.state.isLogginIn, this.trySignIn, 'Go!')}</div>
                                 </div>
                             </div>}
-                            <div style={{width:'100px'}}>{!this.state.showLogin && Button(true, ()=>this.setState({showLogin:true}), 'Online Play')}</div>
                         </div>
                     </div>
                 </div>
