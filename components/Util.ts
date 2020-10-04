@@ -2,7 +2,6 @@ import * as v4 from 'uuid'
 import { Scene } from 'phaser';
 import RoomScene from './canvas/RoomScene';
 import { PlayerColors, RoomItem, RoomItems, Air } from '../enum';
-import * as thyDungeon from 'dungeon-generator' 
 import Digger from "./generators/digger";
 
 enum FirebaseAuthError {

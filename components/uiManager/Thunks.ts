@@ -1,4 +1,4 @@
-import { UIReducerActions, Modal, Air, TURN_LENGTH } from '../../enum'
+import { UIReducerActions, Modal, Air, TURN_LENGTH, RoomItem } from '../../enum'
 import { dispatch, store } from '../../App';
 import Provider from '../../firebase/Network';
 import { getNextPlayerId } from '../Util';
@@ -25,6 +25,20 @@ export const onStartMove = () => {
 export const onKillVirus = () => {
     clearInterval(store.getState().turnTimer)
     Provider.upsertMatch({...store.getState().match, isVictory: true})
+}
+
+export const onShowItemPopup = (tile:RoomItem) => {
+    dispatch({
+        type: UIReducerActions.TILE_POPUP,
+        tile
+    })
+}
+
+export const onShowGravePopup = (grave:GraveState) => {
+    dispatch({
+        type: UIReducerActions.TILE_POPUP,
+        tile: grave
+    })
 }
 
 export const onMove = (player:PlayerState, roomX:number, roomY:number) => {

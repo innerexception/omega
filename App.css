@@ -34,11 +34,24 @@ input {
   width:100%;
 }
 
+.rc-tooltip {
+  position: absolute;
+  z-index: 1070;
+  display: block;
+  visibility: visible;
+  line-height: 1.5;
+}
+.rc-tooltip-hidden {
+  display: none;
+}
 .rc-tooltip-inner{
   min-height: 0;
   max-width: 20em;
   background: #555;
   color:white;
+  padding:5px;
+  border-radius: 0.5em;
+  border: 1px solid white;
 }
 
 /* @media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {

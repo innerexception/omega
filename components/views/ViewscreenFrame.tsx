@@ -42,7 +42,7 @@ export default class ViewscreenFrame extends React.Component<Props> {
                         <div style={{position:'relative'}}>
                             {this.props.modalState && this.props.modalState.modal === Modal.TILE &&
                             <div style={{position:"absolute", top:'6vh', left:0,right:0,margin:'auto', height:'150px', width:'200px'}}>
-                                <TilePopup />
+                                <TilePopup item={this.props.modalState.data} />
                             </div>}
                             <Viewscreen/>
                         </div>

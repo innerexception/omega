@@ -1,6 +1,8 @@
 import * as React from 'react'
 import AppStyles, { colors } from '../AppStyles'
 import { Icons, CSSTiles } from '../assets/Assets';
+import Tooltip from 'rc-tooltip'
+
 
 export const TopBar = (text:string|JSX.Element) => 
     <div style={AppStyles.topBar}>
@@ -9,11 +11,13 @@ export const TopBar = (text:string|JSX.Element) =>
         <div style={{width:'33%'}}><hr style={AppStyles.hr}/><hr style={AppStyles.hr}/><hr style={AppStyles.hr}/><hr style={AppStyles.hr}/></div>
     </div>
 
-export const Button = (enabled:boolean, handler:any, text:JSX.Element | string) => 
-    <div style={{...AppStyles.buttonOuter, pointerEvents: enabled ? 'all' : 'none'}} 
-        onClick={handler}>
-        <div style={{...AppStyles.buttonInner, opacity: enabled ? 1 : 0.5}}>{text}</div>
-    </div>
+export const Button = (enabled:boolean, handler:any, text:JSX.Element | string, tooltip?: string) => 
+        <div style={{...AppStyles.buttonOuter}} 
+            onClick={enabled ? handler : null}>
+            <Tooltip placement="bottom" mouseEnterDelay={1} trigger={tooltip ? ['hover'] : []} overlay={<h5>{tooltip}</h5>}>
+                <div style={{...AppStyles.buttonInner, opacity: enabled ? 1 : 0.5}}>{text}</div>
+            </Tooltip>
+        </div>
 
 export const ToggleButton = (state:boolean, handler:any, text:JSX.Element | string) => 
     <div style={{...AppStyles.buttonOuter, color:state ? 'white' : 'black', background:state?'black':'white'}} 
@@ -110,7 +114,7 @@ export const TileIcon = (iconName:number) =>
         width:'16px', 
         height: '16px', 
         backgroundImage: 'url('+CSSTiles+')', 
-        backgroundPosition: -(iconName % 8)*16+'px 0px', 
+        backgroundPosition: -(iconName % 10)*16+'px 0px', 
         backgroundRepeat:'no-repeat',
         transform:'scale(1.5)',
         display:'inline-block'}}/>

@@ -3,7 +3,7 @@ import { store } from "../../App";
 import { defaults } from '../../assets/Assets'
 import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air, TURN_LENGTH } from "../../enum";
 import Player from "./Interactable";
-import { onMatchUpdated, onEndPlayerAction, onMove } from "../uiManager/Thunks";
+import { onMatchUpdated, onEndPlayerAction, onMove, onShowItemPopup, onShowGravePopup } from "../uiManager/Thunks";
 import { DIRS } from "../generators/digger";
 const ROOM_DIM = 3
 const TILE_WIDTH=16
@@ -136,7 +136,7 @@ export default class RoomScene extends Scene {
                             targets: this.warningText,
                             alpha: 0,
                             duration:500,
-                            repeat: 4,
+                            repeat: 3,
                             ease: 'Stepped',
                             easeParams: [3],
                             yoyo:true,
@@ -173,7 +173,7 @@ export default class RoomScene extends Scene {
         this.anims.create({
             key: 'hacking',
             frames: this.anims.generateFrameNumbers('hacking', { start: 0, end: 10 }),
-            frameRate: 8,
+            frameRate: 4,
             hideOnComplete: true
         });
         this.effects = this.add.group()
@@ -195,6 +195,13 @@ export default class RoomScene extends Scene {
                 this.g.clear()
                 this.validMoves = []
                 onMove(me, move.room.roomX, move.room.roomY)
+            }
+            let tile = this.map.getTileAtWorldXY(this.input.activePointer.worldX, this.input.activePointer.worldY, false, undefined, 'items')
+            if(tile){
+                onShowItemPopup(tile.index as RoomItem)
+            }
+            else if(GameObjects[0] && GameObjects[0].isDead) {
+                onShowGravePopup(store.getState().match.graves.find(g=>g.id === GameObjects[0].id))
             }
         })
         this.initCompleted = true

@@ -39,7 +39,7 @@ export default class Toolbar extends React.Component<Props> {
                         <h4>{activePlayer.actions} Actions Left</h4>
                     </div>
                     <div style={{display:'flex', alignItems:'center'}}>
-                        <h4 style={{marginRight:'0.5em'}}>Next Virus Spread:</h4>
+                        <h4 style={{marginRight:'0.5em'}}>Next Virus Attack:</h4>
                         {ProgressBar(this.props.ticks % TURN_LENGTH, TURN_LENGTH, virus)}
                     </div>
                     <div>
@@ -57,17 +57,17 @@ export default class Toolbar extends React.Component<Props> {
                     </div>
                     {!coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playerRoom && playerRoom.roomItem ? true : false, onSearch, '(S)earch')}
+                            {Button(playerRoom && playerRoom.roomItem ? true : false, onSearch, '(S)earch', 'Pickup any item found in this room')}
                         </div>}
                     <div style={{marginRight:'0.5em'}}>
-                        {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair')}
+                        {Button(playerRoom && playerRoom.airState > Air.Normal, onRepair, '(R)epair', 'Repair damage to this room')}
                     </div>
                     {coreRoom && 
                         <div style={{marginRight:'0.5em'}}>
-                            {Button(playersHaveKeys(playerRoom, this.props.match.players), onKillVirus, '(K)ill Virus')}
+                            {Button(playersHaveKeys(playerRoom, this.props.match.players), onKillVirus, '(K)ill Virus', 'With all 4 decryption spheres in hand, destroy the virus.')}
                         </div>}
-                    {Button(true, onPassTurn, '(P)ass')}
-                    {Button(true, onLeaveMatch, 'Quit')}
+                    {Button(true, onPassTurn, '(P)ass', 'Skip your turn')}
+                    {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
                 </div>
         ]
     }

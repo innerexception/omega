@@ -40,6 +40,7 @@ export const PlayerColors = [
     '#DD9058'
 ]
 
+
 export enum Modal {
     HELP,
     CONFIRM,
@@ -55,7 +56,16 @@ export enum Air {
 }
 
 export enum RoomItem {
-    PurpleSphere=3, RedSphere=4, GreenSphere=5, BlueSphere=6, CoreMemory=8, Exit=7, Logo=9
+    PurpleSphere=3, RedSphere=4, GreenSphere=5, BlueSphere=6, CoreMemory=8, Exit=7, Logo=9, Grave=111
 }
 
 export const RoomItems = [RoomItem.RedSphere, RoomItem.BlueSphere, RoomItem.GreenSphere, RoomItem.PurpleSphere, RoomItem.CoreMemory]
+
+export const ItemDescriptions = {
+    [RoomItem.BlueSphere]: 'The blue decryption sphere. Collect all 4 to erase the virus.',
+    [RoomItem.CoreMemory]: 'The core memory access. Bring the 4 decryption spheres here.',
+    [RoomItem.GreenSphere]: 'The green decryption sphere. Collect all 4 to erase the virus.',
+    [RoomItem.PurpleSphere]: 'The purple decryption sphere. Collect all 4 to erase the virus.',
+    [RoomItem.RedSphere]: 'The red decryption sphere. Collect all 4 to erase the virus.',
+    [RoomItem.Grave]: 'Here lies $'
+}

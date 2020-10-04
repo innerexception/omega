@@ -4,9 +4,9 @@ Omega Virus
 3. choose action: move, repair, search, (special: breach door. 0 move cost but area will decompress as one space)
 7. Players can't move through vacuum rooms without a suit
 
-1. Show move actions on remote clients (diff on redrawBoard, previousState)
 2. Make sure players who leave/die drop their inventory
 3. Add suit pickups for vacuum moves
 4. Fix occasional incorrect movement option
 5. Add player color special abilities
-6. Add 'pass'
+6. Add popup for tile info: items, graves
+7. Add tooltips for buttons
