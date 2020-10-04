@@ -50,6 +50,6 @@ export default class Viewscreen extends React.Component<Props, State> {
     }
 
     render() {
-        return <div ref={this.state.containerRef} id='canvasEl' style={{width:'1024px', height:'768px', boxShadow: AppStyles.boxShadow, maxHeight:'80vh', maxWidth:'60vw', border:'1px solid black', borderRadius:'3px', overflow:'hidden', margin:'1em'}}/>
+        return <div ref={this.state.containerRef} id='canvasEl' style={{width:'1024px', height:'768px', boxShadow: AppStyles.boxShadow, maxHeight:'80vh', maxWidth:'calc(100vw - 1em)', border:'1px solid black', borderRadius:'3px', overflow:'hidden', margin:'1em'}}/>
     }
 }

@@ -18,7 +18,7 @@ export const colors = {
     background: 'black',
 }
 
-export const modalBg = require('./assets/ui/modal.png')
+export const modalBg = require('./assets/tiny.png')
 
 export default {
     window: {
@@ -62,13 +62,14 @@ export default {
     },
     modal: {
         backgroundImage: 'url('+modalBg+')',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize:'contain',
-        backgroundColor: 'white',
+        backgroundColor: 'black',
+        border: '6px double',
+        borderRadius:'1em',
+        color:'white',
         position:'absolute' as 'absolute',
-        width: '444px',
-        height: '300px',
         margin: 'auto',
+        maxWidth:'400px',
+        maxHeight:'320px',
         zIndex:2,
         padding:'1em',
         top:0,left:0,bottom:0,right:0

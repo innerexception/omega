@@ -23,6 +23,7 @@ export const onStartMove = () => {
 }
 
 export const onKillVirus = () => {
+    clearInterval(store.getState().turnTimer)
     Provider.upsertMatch({...store.getState().match, isVictory: true})
 }
 
@@ -35,6 +36,14 @@ export const onMove = (player:PlayerState, roomX:number, roomY:number) => {
         }
     })
     onEndPlayerAction(match)
+}
+
+export const onPassTurn = () => {
+    let match = store.getState().match
+    const me = match.players.find(p=>p.id === store.getState().onlineAccount.uid)
+    match.activePlayerId = getNextPlayerId(match.players, match.activePlayerId)
+    me.actions = 2
+    Provider.upsertMatch(match)
 }
 
 export const onLeaveMatch = () => {

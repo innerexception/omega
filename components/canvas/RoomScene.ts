@@ -1,7 +1,7 @@
 import { Scene, GameObjects, Tilemaps, Geom } from "phaser";
 import { store } from "../../App";
 import { defaults } from '../../assets/Assets'
-import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air } from "../../enum";
+import { UIReducerActions, FONT_DEFAULT, Modal, RoomItem, Air, TURN_LENGTH } from "../../enum";
 import Player from "./Interactable";
 import { onMatchUpdated, onEndPlayerAction, onMove } from "../uiManager/Thunks";
 import { DIRS } from "../generators/digger";
@@ -29,7 +29,7 @@ export default class RoomScene extends Scene {
     initCompleted: boolean
     players: Array<Player>
     graves: Array<Player>
-    texts: Array<GameObjects.Text>
+    warningText: GameObjects.Text
     lastNeighbors: Array<Tilemaps.Tile>
     countText: GameObjects.Text
     
@@ -67,6 +67,7 @@ export default class RoomScene extends Scene {
                     })
                     break
                 case UIReducerActions.SEARCH:
+                    this.clearMovement()
                     //Grab the item
                     let rroom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     const mmatch = {...uiState.match, players: uiState.match.players.map(p=>{
@@ -79,6 +80,7 @@ export default class RoomScene extends Scene {
                     onEndPlayerAction(mmatch)
                     break
                 case UIReducerActions.KILL_VIRUS:
+                    this.clearMovement()
                     //Move character to top left corner of room
                     this.tweens.add({
                         targets: mySprite,
@@ -93,6 +95,7 @@ export default class RoomScene extends Scene {
                     })
                     break
                 case UIReducerActions.REPAIR:
+                    this.clearMovement()
                     //Play welder animation
                     let proom = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     const match = {...uiState.match, rooms: uiState.match.rooms.map(r=>{
@@ -107,6 +110,10 @@ export default class RoomScene extends Scene {
                     //Highlight adjacent rooms
                     let room = uiState.match.rooms.find(r=>r.roomX===plData.roomX && r.roomY === plData.roomY)
                     this.g.clear()
+                    if(this.validMoves.length > 0){
+                        this.validMoves = []
+                        return
+                    }
                     room.exits.forEach(e=>{
                         DIRS[4].forEach(dir=>{
                             const ex = e.x*TILE_WIDTH+(dir[0]*TILE_WIDTH)
@@ -121,7 +128,28 @@ export default class RoomScene extends Scene {
                         })
                     })
                     break
+                case UIReducerActions.MATCH_TICK:
+                    if(uiState.matchTicks % TURN_LENGTH === 0){
+                        this.warningText = this.add.text(mySprite.x-74, mySprite.y-50, 'Virus damaging station!!', FONT_DEFAULT).setDepth(5)
+                        this.warningText.setStroke('#000000', 3);
+                        this.tweens.add({
+                            targets: this.warningText,
+                            alpha: 0,
+                            duration:500,
+                            repeat: 4,
+                            ease: 'Stepped',
+                            easeParams: [3],
+                            yoyo:true,
+                            onComplete: ()=>this.warningText.destroy()
+                        })
+                    }
+                    break
             }
+    }
+
+    clearMovement = () => {
+        this.g.clear()
+        this.validMoves = []
     }
 
     create = () =>
@@ -212,6 +240,8 @@ export default class RoomScene extends Scene {
                         to: t.pixelY
                     },
                     repeat:4,
+                    ease: 'Stepped',
+                    easeParams: [3],
                     duration: 100
                 })
             })
@@ -226,6 +256,8 @@ export default class RoomScene extends Scene {
                         from: t.pixelY+Phaser.Math.Between(-4,4),
                         to: t.pixelY
                     },
+                    ease: 'Stepped',
+                    easeParams: [3],
                     duration: 250
                 })
             })
@@ -268,7 +300,9 @@ export default class RoomScene extends Scene {
                         x: pSprite.x-8,
                         y: pSprite.y-8,
                         duration: 500,
-                        yoyo: true
+                        yoyo: true,
+                        ease: 'Stepped',
+                        easeParams: [3],
                     })
                 }
                 this.map.putTileAt(-1, r.roomX, r.roomY, false, 'items')

@@ -77,7 +77,7 @@ export const IconSelect = (value:string, onValueChange:Function, values: Array<s
     </div>
 
 export const ProgressBar = (value:number, max:number, bg) => 
-    <div style={{width:'85%', height:'10px', border:'1px solid'}}>
+    <div style={{width:'10em', height:'16px', border:'1px solid'}}>
         <div style={{background:'url('+bg+')', width:Math.round((value/max)*100)+'%', height:'100%'}}/>
     </div>
 

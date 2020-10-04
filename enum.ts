@@ -23,8 +23,8 @@ export const TURN_LENGTH = 15
 
 export const FONT_DEFAULT = {
     fontFamily: 'Body', 
-    fontSize: '14px',
-    color:'black',
+    fontSize: '18px',
+    color:'orange',
 }
 
 export const PlayerColors = [

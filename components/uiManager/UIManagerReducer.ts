@@ -59,7 +59,7 @@ const appReducer = (state = getInitialState(), action:any):RState => {
             return { ...state, engineEvent: { event: UIReducerActions.START_MOVE, data:null }}
         case UIReducerActions.MATCH_TICK:
             state.matchTicks++
-            return { ...state, matchTicks: state.matchTicks }
+            return { ...state, matchTicks: state.matchTicks, engineEvent: { event: UIReducerActions.MATCH_TICK, data:null } }
         default:
             return state
     }

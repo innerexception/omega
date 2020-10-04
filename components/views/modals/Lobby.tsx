@@ -62,11 +62,9 @@ export default class Lobby extends React.Component<Props,State> {
                     </div>
                     <hr/>
                     <div style={{display:'flex', justifyContent:'flex-end'}}>
-                        <div style={{width:'100px', marginRight:'0.5em'}}>{Button(true, ()=>onCreateMatch(this.state.playerName+"'s Station", getNewPlayer(this.state.playerName, this.props.player.uid)), 'Create Station')}</div>
+                        <div style={{marginRight:'1em'}}>{Button(true, ()=>onCreateMatch(this.state.playerName+"'s Station", getNewPlayer(this.state.playerName, this.props.player.uid)), 'Create Station')}</div>
                         {findLowestPopMatch(this.state.matches) && 
-                            <div style={{width:'100px'}}>
-                                {Button(true, ()=>onJoinMatch(findLowestPopMatch(this.state.matches).id, getNewPlayer(this.state.playerName, this.props.player.uid)), 'Join Station')}
-                            </div>
+                            Button(true, ()=>onJoinMatch(findLowestPopMatch(this.state.matches).id, getNewPlayer(this.state.playerName, this.props.player.uid)), 'Join Station')
                         }
                     </div>
                 </div>

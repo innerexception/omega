@@ -9,4 +9,4 @@ Omega Virus
 3. Add suit pickups for vacuum moves
 4. Fix occasional incorrect movement option
 5. Add player color special abilities
-6. Add cancel move
+6. Add 'pass'

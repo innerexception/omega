@@ -4,7 +4,7 @@ import { Button } from '../../Shared';
 import { getErrorMessage } from '../../Util';
 import Provider from '../../../firebase/Network';
 
-const splash = require('../../../assets/Cryptomnesic2.png')
+const bg = require('../../../assets/splash2.png')
 
 interface Props {}
 
@@ -47,7 +47,7 @@ export default class Menu extends React.Component<Props, State> {
                     <h1 style={{fontFamily:'Title'}}>Omega Virus</h1>
                     <hr/>
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-around', height:'230px'}}>
-                        <div style={{backgroundImage: 'url('+splash+')', backgroundPosition:'center', width: '250px', height:'190px', border:'2px inset'}}/>
+                        <div style={{backgroundImage: 'url('+bg+')', backgroundPosition:'center', backgroundSize:'contain', width: '250px', height:'190px', border:'2px inset'}}/>
                         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                             {this.state.error && <h4 style={{color:'gray'}}>{this.state.error}</h4>}
                             {this.state.showLogin && 

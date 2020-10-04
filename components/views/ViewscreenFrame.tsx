@@ -6,10 +6,7 @@ import Viewscreen from './Viewscreen';
 import Toolbar from './Toolbar'
 import Lobby from './modals/Lobby';
 import TilePopup from './modals/TilePopup';
-import AppStyles from '../../AppStyles';
-import { Button } from '../Shared';
-import { onLeaveMatch } from '../uiManager/Thunks';
-const bg = require('../../assets/patterns/gray.png')
+const bg = require('../../assets/space.png')
 
 interface Props {
     modalState?:ModalState
@@ -35,11 +32,11 @@ export default class ViewscreenFrame extends React.Component<Props> {
     render(){
         const isStarted = this.props.match
         return (
-            <div style={{position:'relative', display:'flex', backgroundImage:'url('+bg+')', borderRadius:'5px', margin:'1px', 
+            <div style={{position:'relative', display:'flex', background:'black', borderRadius:'5px', margin:'1px', backgroundImage: isStarted ? 'none' : 'url('+bg+')',
                          width: isStarted ? '' : '85%', height: isStarted ? '' : '85%'}}>
                 {this.props.modalState && this.getModal()}
                 <div style={{width:'100%'}}>
-                    {this.props.me && <h4 style={{position:'absolute', bottom:10,left:10}}>Logged in as: {this.props.me.email}</h4>}
+                    {this.props.me && <h4 style={{position:'absolute', bottom:10,left:10, color:'white', textShadow:'2px 2px black'}}>Logged in as: {this.props.me.email}</h4>}
                     {isStarted && <Toolbar/>}
                     {isStarted && 
                         <div style={{position:'relative'}}>
@@ -48,9 +45,6 @@ export default class ViewscreenFrame extends React.Component<Props> {
                                 <TilePopup />
                             </div>}
                             <Viewscreen/>
-                            <div style={{position:'absolute', bottom:10, right:10}}>
-                                {Button(true, onLeaveMatch, 'X')}
-                            </div>
                         </div>
                     }
                 </div>
