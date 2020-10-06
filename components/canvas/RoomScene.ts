@@ -60,12 +60,7 @@ export default class RoomScene extends Scene {
                         if(this.initCompleted){
                             this.redrawBoard(store.getState().match)
                         }
-                        else this.time.addEvent({
-                            delay:2000,
-                            callback: ()=>{
-                                this.redrawBoard(engineEvent.data)
-                            }
-                        })
+                        else setTimeout(()=>{this.redrawBoard(engineEvent.data)}, 2000)
                         break
                     case UIReducerActions.SEARCH:
                         this.clearMovement()
@@ -322,18 +317,22 @@ export default class RoomScene extends Scene {
                 let g = match.graves.find(g=>g.id === p.id)
                 if(!g){
                     let tile = this.map.getTileAt(r.roomX+1, r.roomY+1, false, 'terrain')
-                    let pl = new Player(this, tile.getCenterX()+(i*3), tile.getCenterY()-6, p.id, Phaser.Display.Color.HexStringToColor(p.color).color)
-                    this.players.push(pl)
-                    if(p.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
+                    if(tile){
+                        let pl = new Player(this, tile.getCenterX()+(i*3), tile.getCenterY()-6, p.id, Phaser.Display.Color.HexStringToColor(p.color).color)
+                        this.players.push(pl)
+                        if(p.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
+                    }
                 }
             })
 
             let g = match.graves.filter(p=>p.roomY===r.roomY && p.roomX === r.roomX)
             g.forEach((g,i)=>{
                 let tile = this.map.getTileAt(r.roomX+1, r.roomY+1, false, 'terrain')
-                let pl = new Player(this, tile.getCenterX()+(i*3), tile.getCenterY(), g.id, Phaser.Display.Color.HexStringToColor(g.color).color, true)
-                this.graves.push(pl)
-                if(g.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
+                if(tile){
+                    let pl = new Player(this, tile.getCenterX()+(i*3), tile.getCenterY(), g.id, Phaser.Display.Color.HexStringToColor(g.color).color, true)
+                    this.graves.push(pl)
+                    if(g.id === store.getState().onlineAccount.uid) this.cameras.main.startFollow(pl)
+                }
             })
 
             if(r.exits[0].isOpen || r.roomItem === RoomItem.CoreMemory){

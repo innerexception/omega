@@ -46,7 +46,7 @@ export default class Lobby extends React.Component<Props,State> {
 
     render(){
         return (
-            <div style={{...AppStyles.modal, justifyContent:'space-between'}}>
+            <div style={{...AppStyles.modal, justifyContent:'space-between', height:'200px'}}>
                 <div>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop:'5px'}}>
                         <h2>Station Prep</h2>

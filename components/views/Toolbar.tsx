@@ -31,7 +31,10 @@ export default class Toolbar extends React.Component<Props> {
         if(this.props.match.graves.find(g=>g.id === this.props.me.uid)) 
             return Button(true, onLeaveMatch, 'R.I.P')
         if(activePlayer.id !== this.props.me.uid)
-            return <h4>{activePlayer.name}'s Turn</h4>
+            return <div>
+                        <h4>{activePlayer.name}'s Turn</h4>
+                        {Button(true, onLeaveMatch, '(Q)uit', 'Exit the station')}
+                   </div>
 
         return [
                 <div style={{display:'flex', alignItems:'center', marginBottom:'0.5em'}}>
