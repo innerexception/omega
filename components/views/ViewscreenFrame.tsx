@@ -36,7 +36,6 @@ export default class ViewscreenFrame extends React.Component<Props> {
                          width: isStarted ? '' : '85%', height: isStarted ? '' : '85%'}}>
                 {this.props.modalState && this.getModal()}
                 <div style={{width:'100%'}}>
-                    {this.props.me && <h4 style={{position:'absolute', bottom:10,left:10, color:'white', textShadow:'2px 2px black'}}>Logged in as: {this.props.me.email}</h4>}
                     {isStarted && <Toolbar/>}
                     {isStarted && 
                         <div style={{position:'relative'}}>

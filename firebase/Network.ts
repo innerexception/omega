@@ -8,7 +8,7 @@ import { RoomItem, Air } from '../enum';
 import { Schemas } from './Schemas'
 import { onLoginUser, onMatchUpdated, onLogoutUser, onMatchJoin, onUpdatePlayerName, onJoinExisting } from '../components/uiManager/Thunks';
 import { getNewMatchObject, getNextPlayerId } from '../components/Util';
-
+import * as v4 from 'uuid'
 export const servicePwd = '4yhw64h67eh6s5gs5rgghn#^H#%^H'
 export const serviceEmail = 'scoring@crytomnesicsoftworks.com'
 
@@ -34,7 +34,7 @@ class Network {
                 }
                 onLoginUser(user)
             } else {
-                onLogoutUser()
+                await Provider.onCreateUser(v4()+'@email.com', v4())
             }
         });
     }

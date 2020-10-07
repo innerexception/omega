@@ -50,7 +50,6 @@ export default class Lobby extends React.Component<Props,State> {
                 <div>
                     <div style={{display:'flex', justifyContent:'space-between', marginTop:'5px'}}>
                         <h2>Station Prep</h2>
-                        <div style={{width:'100px'}}>{Button(true, ()=>Provider.logoutUser(), 'Logout')}</div>
                     </div>
                     <hr/>
                     <h6>Handle</h6>
